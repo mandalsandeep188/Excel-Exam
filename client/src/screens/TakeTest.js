@@ -114,7 +114,7 @@ export default function Taketest() {
                   </>
                 )}
 
-                <div className="row options">
+                <div className="row select-options">
                   <div className="col-md-6">
                     <input
                       type="radio"
@@ -128,7 +128,7 @@ export default function Taketest() {
                       className="btn btn-outline-primary check-opt"
                       htmlFor="optionA"
                     >
-                      A
+                      Option A
                     </label>
                   </div>
                   <div className="col-md-6">
@@ -144,7 +144,7 @@ export default function Taketest() {
                       className="btn btn-outline-primary check-opt"
                       htmlFor="optionB"
                     >
-                      B
+                      Option B
                     </label>
                   </div>
                   <div className="col-md-6">
@@ -160,7 +160,7 @@ export default function Taketest() {
                       className="btn btn-outline-primary check-opt"
                       htmlFor="optionC"
                     >
-                      C
+                      Option C
                     </label>
                   </div>
                   <div className="col-md-6">
@@ -176,15 +176,31 @@ export default function Taketest() {
                       className="btn btn-outline-primary check-opt"
                       htmlFor="optionD"
                     >
-                      D
+                      Option D
                     </label>
                   </div>
                 </div>
                 <div className="col-md-12 justify-content-between d-flex">
-                  <button type="button" className="btn btn-info change">
+                  <button
+                    type="button"
+                    className="btn btn-info prev"
+                    onClick={() => {
+                      if (questionNo - 2 >= 0) {
+                        selectedQuestion(questionNo - 2);
+                      }
+                    }}
+                  >
                     Previous
                   </button>
-                  <button type="button" className="btn btn-info change">
+                  <button
+                    type="button"
+                    className="btn btn-info next"
+                    onClick={() => {
+                      if (questionNo < state.totalQuestions) {
+                        selectedQuestion(questionNo);
+                      }
+                    }}
+                  >
                     Next
                   </button>
                 </div>

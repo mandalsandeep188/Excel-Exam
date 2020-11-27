@@ -109,7 +109,11 @@ export default function MakeTest() {
   const makeTest = () => {
     dispatch({
       type: "TEST",
-      payload: { questionsFetched, selectedQuestions },
+      payload: {
+        questionsFetched,
+        selectedQuestions,
+        totalQuestions: selectedQuestions.length,
+      },
     });
     history.push("/taketest");
   };

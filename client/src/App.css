@@ -151,6 +151,8 @@ i {
   margin-left: 25px;
   border-radius: 8px;
   padding: 0;
+  min-height: 500px;
+  position: relative;
 }
 .ques-no {
   background-color: white;
@@ -182,9 +184,20 @@ i {
 .options {
   margin: 10px 20px;
 }
+.select-options {
+  margin: 50px 20px;
+}
 .check-opt {
   margin-bottom: 10px;
 }
-.change {
+.prev {
   margin: 10px;
+  position: absolute;
+  bottom: 0;
+}
+.next {
+  margin: 10px;
+  position: absolute;
+  bottom: 0;
+  right: 0;
 }
