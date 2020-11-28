@@ -2,8 +2,26 @@ body {
   font-family: "Roboto", sans-serif;
   background-color: #e0e9f7;
 }
+
+/* Scrollbar CSS */
+/* width */
 ::-webkit-scrollbar {
-  width: 10px;
+  width: 8px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }
 
 /* Navbar */
@@ -179,6 +197,12 @@ i {
   padding: 10px;
   border-top-right-radius: 8px;
   border-top-left-radius: 8px;
+  margin-bottom: 10px;
+}
+.q-sub {
+  background-color: #31a2b8;
+  color: white;
+  padding: 5px;
   margin-bottom: 10px;
 }
 .options {

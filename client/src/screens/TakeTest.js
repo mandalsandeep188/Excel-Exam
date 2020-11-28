@@ -7,28 +7,36 @@ export default function Taketest() {
   const { state, dispatch } = useContext(QuestionContext);
   const [displayQuestion, setDisplayQuestion] = useState(null);
   const [questions, setQuestions] = useState([]);
+  const [physics, setPhysics] = useState([]);
+  const [chemistry, setChemistry] = useState([]);
+  const [maths, setMaths] = useState([]);
   const [questionNo, setQuestionNo] = useState(1);
 
   useEffect(() => {
     if (state) {
-      let arr = [];
-      state.questionsFetched.forEach((question) => {
-        if (question._id === state.selectedQuestions[0]) {
-          setDisplayQuestion(question);
-        }
-        arr.push(question);
+      let chem = [];
+      let phy = [];
+      let math = [];
+      state.selectedQuestions.forEach((question) => {
+        if (question.subject === "Physics") phy.push(question);
+        if (question.subject === "Mathematics") math.push(question);
+        if (question.subject === "Chemistry") chem.push(question);
       });
+      setChemistry(chem);
+      setPhysics(phy);
+      setMaths(math);
+      let arr = [...phy, ...chem, ...math];
       setQuestions(arr);
+      setDisplayQuestion(arr[0]);
     }
   }, []);
 
   const selectedQuestion = (i) => {
-    console.log(i, questions[i]);
     setDisplayQuestion(questions[i]);
     setQuestionNo(i + 1);
   };
 
-  console.log(questions, displayQuestion, questionNo);
+  console.log(questions, physics, chemistry, maths);
 
   return (
     <>
@@ -66,9 +74,10 @@ export default function Taketest() {
           <div className="col-md-3 question-opt-div">
             <div className="row ques-no">
               <div className="q-no">Questions </div>
-              {state ? (
+              {physics.length > 0 ? (
                 <>
-                  {[...Array(state.selectedQuestions.length)].map((e, i) => {
+                  <div className="q-sub">Physics </div>
+                  {[...Array(physics.length)].map((e, i) => {
                     return (
                       <div className="col-md-3" key={i}>
                         <button
@@ -77,6 +86,46 @@ export default function Taketest() {
                           onClick={() => selectedQuestion(i)}
                         >
                           {i + 1}
+                        </button>
+                      </div>
+                    );
+                  })}
+                </>
+              ) : undefined}
+              {chemistry.length > 0 ? (
+                <>
+                  <div className="q-sub">Chemistry </div>
+                  {[...Array(chemistry.length)].map((e, i) => {
+                    return (
+                      <div className="col-md-3" key={i}>
+                        <button
+                          type="button"
+                          className="btn btn-primary ques-opt"
+                          onClick={() => selectedQuestion(i + physics.length)}
+                        >
+                          {i + physics.length + 1}
+                        </button>
+                      </div>
+                    );
+                  })}
+                </>
+              ) : undefined}
+              {maths.length > 0 ? (
+                <>
+                  <div className="q-sub">Mathematics </div>
+                  {[...Array(maths.length)].map((e, i) => {
+                    return (
+                      <div className="col-md-3" key={i}>
+                        <button
+                          type="button"
+                          className="btn btn-primary ques-opt"
+                          onClick={() =>
+                            selectedQuestion(
+                              i + physics.length + chemistry.length
+                            )
+                          }
+                        >
+                          {i + physics.length + chemistry.length + 1}
                         </button>
                       </div>
                     );
@@ -196,7 +245,7 @@ export default function Taketest() {
                     type="button"
                     className="btn btn-info next"
                     onClick={() => {
-                      if (questionNo < state.totalQuestions) {
+                      if (questionNo < questions.length) {
                         selectedQuestion(questionNo);
                       }
                     }}
