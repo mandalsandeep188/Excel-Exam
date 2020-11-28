@@ -199,6 +199,12 @@ i {
   border-top-left-radius: 8px;
   margin-bottom: 10px;
 }
+.q-sub {
+  background-color: #31a2b8;
+  color: white;
+  padding: 5px;
+  margin-bottom: 10px;
+}
 .options {
   margin: 10px 20px;
 }

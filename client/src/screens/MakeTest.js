@@ -107,12 +107,16 @@ export default function MakeTest() {
   }, [selectedChapter]);
 
   const makeTest = () => {
+    let quesList = [];
+    questionsFetched.forEach((question) => {
+      if (selectedQuestions.includes(question._id)) {
+        quesList.push(question);
+      }
+    });
     dispatch({
       type: "TEST",
       payload: {
-        questionsFetched,
-        selectedQuestions,
-        totalQuestions: selectedQuestions.length,
+        selectedQuestions: quesList,
       },
     });
     history.push("/taketest");
