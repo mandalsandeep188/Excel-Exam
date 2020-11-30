@@ -1,9 +1,12 @@
 import React from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import "../App.css";
-import Login from "..screens/Login.js";
+import Login from "../screens/Login";
+import Register from "../screens/Register";
 
 export default function Navbar() {
+  const [buttonTarget, setbuttonTarget] = useState("");
   return (
     <>
       <nav className="navbar navbar-expand-lg navbar-light bg-light">
@@ -97,6 +100,7 @@ export default function Navbar() {
                   className="btn btn-primary"
                   data-toggle="modal"
                   data-target="#login"
+                  onClick={() => setbuttonTarget("login")}
                 >
                   Login
                 </button>
@@ -104,7 +108,8 @@ export default function Navbar() {
                   type="button"
                   className="btn btn-outline-primary"
                   data-toggle="modal"
-                  data-target="#register"
+                  data-target="#login"
+                  onClick={() => setbuttonTarget("register")}
                 >
                   Register
                 </button>
@@ -120,16 +125,17 @@ export default function Navbar() {
         id="login"
         data-backdrop="static"
         data-keyboard="false"
-        tabindex="-1"
+        tabIndex="-1"
         aria-labelledby="login"
         aria-hidden="true"
       >
         <div className="modal-dialog modal-lg">
           <div className="modal-content">
             <div className="modal-header">
-              <h5 className="modal-title" id="staticBackdropLabel">
-                Login to Exam Excel
-              </h5>
+              <div className=" navbar-brand">
+                <img src="EE.png" />
+                <span className="brand">Excel Exam</span>
+              </div>
               <button
                 type="button"
                 className="btn-close"
@@ -138,18 +144,28 @@ export default function Navbar() {
               ></button>
             </div>
             <div className="modal-body">
-              <Login />
+              {buttonTarget === "login" ? <Login /> : <Register />}
             </div>
             <div className="modal-footer">
               <button
                 type="button"
-                className="btn btn-secondary"
-                data-dismiss="modal"
+                className="btn btn-link"
+                data-toggle="modal"
+                data-target="#login"
+                onClick={() =>
+                  setbuttonTarget(
+                    `${buttonTarget === "login" ? "register" : "login"}`
+                  )
+                }
               >
-                Close
+                {buttonTarget === "login" ? (
+                  <>Create a new account</>
+                ) : (
+                  <>Already have an account</>
+                )}
               </button>
               <button type="button" className="btn btn-primary">
-                Login
+                {buttonTarget === "login" ? <>Login</> : <>Register</>}
               </button>
             </div>
           </div>
