@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import "../App.css";
-import { Link } from "react-router-dom";
+import { Link, Prompt, useHistory } from "react-router-dom";
 import { QuestionContext } from "../App";
 
 export default function Taketest() {
@@ -11,8 +11,14 @@ export default function Taketest() {
   const [chemistry, setChemistry] = useState([]);
   const [maths, setMaths] = useState([]);
   const [questionNo, setQuestionNo] = useState(1);
+  const history = useHistory();
 
   useEffect(() => {
+    window.addEventListener("beforeunload", function (e) {
+      let confirmationMessage = "Are you sure you want to leave?";
+      (e || window.event).returnValue = confirmationMessage; //Gecko + IE
+      return confirmationMessage; //Webkit, Safari, Chrome
+    });
     if (state) {
       let chem = [];
       let phy = [];
@@ -36,10 +42,12 @@ export default function Taketest() {
     setQuestionNo(i + 1);
   };
 
-  console.log(questions, physics, chemistry, maths);
-
   return (
     <>
+      <Prompt
+        when={true}
+        message="Are you sure you want to leave? Test will get cancelled!!"
+      />
       <nav className="navbar navbar-expand-lg navbar-light bg-light">
         <div className="container-fluid">
           <Link className="navbar-brand" to="/">
