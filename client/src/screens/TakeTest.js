@@ -11,11 +11,14 @@ export default function Taketest() {
   const [chemistry, setChemistry] = useState([]);
   const [maths, setMaths] = useState([]);
   const [questionNo, setQuestionNo] = useState(1);
+  const [time, setTime] = useState("00 : 00 : 00");
   const history = useHistory();
 
   useEffect(() => {
     window.addEventListener("beforeunload", function (e) {
-      let confirmationMessage = "Are you sure you want to leave?";
+      let confirmationMessage = "Are you sure you want to cancel test?";
+      dispatch({ type: "TEST", payload: null });
+
       (e || window.event).returnValue = confirmationMessage; //Gecko + IE
       return confirmationMessage; //Webkit, Safari, Chrome
     });
@@ -34,8 +37,39 @@ export default function Taketest() {
       let arr = [...phy, ...chem, ...math];
       setQuestions(arr);
       setDisplayQuestion(arr[0]);
+      let perQuestionTime = 2;
+      setTimer(arr.length * perQuestionTime);
     }
   }, []);
+
+  const setTimer = (countDownTime) => {
+    countDownTime *= 1000 * 60;
+    countDownTime += new Date().getTime();
+
+    const zeroPad = (num, places) => String(num).padStart(places, "0");
+
+    let x = setInterval(() => {
+      let now = new Date().getTime();
+      let distance = countDownTime - now;
+      let hours = Math.floor(distance / (1000 * 60 * 60));
+      let minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      let seconds = Math.floor((distance % (1000 * 60)) / 1000);
+      let timer =
+        zeroPad(hours, 2) +
+        " : " +
+        zeroPad(minutes, 2) +
+        " : " +
+        zeroPad(seconds, 2);
+      setTime(timer);
+
+      // If the count down is finished
+      if (distance < 0) {
+        clearInterval(x);
+        alert("Time Ended!");
+        setTime("00 : 00 : 00");
+      }
+    }, 1000);
+  };
 
   const selectedQuestion = (i) => {
     setDisplayQuestion(questions[i]);
@@ -44,10 +78,7 @@ export default function Taketest() {
 
   return (
     <>
-      <Prompt
-        when={true}
-        message="Are you sure you want to leave? Test will get cancelled!!"
-      />
+      <Prompt when={true} message="Are you sure you want to cancel test?" />
       <nav className="navbar navbar-expand-lg navbar-light bg-light">
         <div className="container-fluid">
           <Link className="navbar-brand" to="/">
@@ -67,8 +98,17 @@ export default function Taketest() {
           </button>
           <div className="collapse navbar-collapse" id="navbarSupportedContent">
             <ul className="navbar-nav mr-auto mb-2 mb-lg-0">
+              <li className="nav-item timer">
+                <h5 className="mx-3 mt-2">{time}</h5>
+              </li>
               <li className="nav-item">
-                <button type="button" className="btn btn-primary">
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={() => {
+                    history.push("/");
+                  }}
+                >
                   Cancel
                 </button>
               </li>
