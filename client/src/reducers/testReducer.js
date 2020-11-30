@@ -4,7 +4,7 @@ export const reducer = (state, action) => {
   if (action.type === "TEST") {
     return action.payload;
   } else if (action.type === "PRACTICE") {
-    return state;
+    return action.payload;
   } else if (action.type === "SUBMIT") {
     return inState;
   }

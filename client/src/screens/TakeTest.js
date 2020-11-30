@@ -17,7 +17,7 @@ export default function Taketest() {
   useEffect(() => {
     window.addEventListener("beforeunload", function (e) {
       let confirmationMessage = "Are you sure you want to cancel test?";
-      dispatch({ type: "TEST", payload: null });
+      // dispatch({ type: "TEST", payload: null });
 
       (e || window.event).returnValue = confirmationMessage; //Gecko + IE
       return confirmationMessage; //Webkit, Safari, Chrome
