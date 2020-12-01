@@ -225,3 +225,26 @@ i {
   bottom: 0;
   right: 0;
 }
+
+/* Login */
+.google {
+  display: flex !important;
+  margin: 10px auto;
+  width: 40% !important;
+  justify-content: center;
+}
+
+.login-form form div {
+  margin: auto;
+}
+.register-pic {
+  display: block;
+  margin: 10px auto;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+}
+
+/* input[type="file"] {
+  overflow: hidden;
+} */
