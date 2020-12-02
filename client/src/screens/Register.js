@@ -2,7 +2,48 @@ import React, { useState, useEffect } from "react";
 import "../App.css";
 import { GoogleLogin } from "react-google-login";
 
+const firebase = require("firebase");
+const storageRef = firebase.storage().ref();
+
 export default function Register() {
+  const [pic, setPic] = useState(null);
+  const [imagePreview, setImagePreview] = useState("user.jpeg");
+  const [name, setName] = useState(null);
+  const [email, setEmail] = useState(null);
+  const [password, setPassword] = useState(null);
+  const [imageUrl, setImageUrl] = useState(null);
+
+  useEffect(() => {
+    if (pic) {
+      let reader = new FileReader();
+      reader.onload = async function () {
+        await setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(pic);
+    }
+  }, [pic]);
+
+  const register = () => {
+    if (pic && email && name) {
+      const fileName = `users/${email}`;
+      storageRef
+        .child(fileName)
+        .put(pic)
+        .then((snapshot) => {
+          storageRef
+            .child(fileName)
+            .getDownloadURL()
+            .then((url) => {
+              setImageUrl(url);
+              console.log(url);
+            })
+            .catch((error) => {
+              alert(error.code);
+            });
+        });
+    }
+  };
+
   const responseGoogle = (response) => {
     console.log(response);
   };
@@ -24,27 +65,66 @@ export default function Register() {
           <div className="mb-3 col-md-8">
             <img
               className="register-pic img-fluid"
-              src="user.jpeg"
+              src={imagePreview}
               alt="Profile pic"
             ></img>
+          </div>
+          <div className="upload-btn-wrapper mb-3 col-md-8">
+            <button className="btn btn-primary">
+              <i className="fa fa-camera icon" aria-hidden="true"></i>
+              Profile Photo
+            </button>
+            <input
+              type="file"
+              name="myfile"
+              accept="image/*"
+              onChange={(e) => setPic(e.target.files[0])}
+            />
           </div>
           <div className="mb-3 col-md-8">
             <label htmlFor="name" className="form-label">
               Name
             </label>
-            <input type="text" className="form-control" id="name" />
+            <input
+              type="text"
+              className="form-control"
+              id="name"
+              onChange={(e) => setName(e.target.value)}
+            />
           </div>
           <div className="mb-3 col-md-8">
             <label htmlFor="email" className="form-label">
               Email address
             </label>
-            <input type="email" className="form-control" id="email" />
+            <input
+              type="email"
+              className="form-control"
+              id="email"
+              onChange={(e) => setEmail(e.target.value)}
+            />
           </div>
           <div className="mb-3 col-md-8">
             <label htmlFor="password" className="form-label">
               Password
             </label>
-            <input type="password" className="form-control" id="password" />
+            <input
+              type="password"
+              className="form-control"
+              id="password"
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
+          <div className="mb-3 col-md-8">
+            <button
+              type="submit"
+              className="btn btn-primary"
+              onClick={(e) => {
+                e.preventDefault();
+                register();
+              }}
+            >
+              Register
+            </button>
           </div>
         </form>
       </div>

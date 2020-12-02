@@ -164,9 +164,6 @@ export default function Navbar() {
                   <>Already have an account</>
                 )}
               </button>
-              <button type="button" className="btn btn-primary">
-                {buttonTarget === "login" ? <>Login</> : <>Register</>}
-              </button>
             </div>
           </div>
         </div>

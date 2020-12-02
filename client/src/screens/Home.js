@@ -2,6 +2,11 @@ import React from "react";
 import { Link } from "react-router-dom";
 import "../App.css";
 import Service from "../Components/Service";
+import firebaseConfig from "../constants/firebase";
+
+const firebase = require("firebase");
+firebase.initializeApp(firebaseConfig);
+firebase.analytics();
 
 export default function Home() {
   return (

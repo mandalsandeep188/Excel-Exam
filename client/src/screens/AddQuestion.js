@@ -4,12 +4,8 @@ import { useHistory } from "react-router-dom";
 import chapters from "../constants/chapters";
 import ReactCrop from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
-import firebaseConfig from "../constants/firebase";
 
 const firebase = require("firebase");
-
-firebase.initializeApp(firebaseConfig);
-firebase.analytics();
 const storageRef = firebase.storage().ref();
 
 function uuidv4() {
@@ -181,7 +177,6 @@ export default function AddQuestion() {
               Subject
             </label>
             <select
-              id="inputState"
               className="form-select"
               onChange={(e) => setSubject(e.target.value)}
             >
@@ -196,7 +191,6 @@ export default function AddQuestion() {
               Class
             </label>
             <select
-              id="inputState"
               className="form-select"
               onChange={(e) => setStandard(e.target.value)}
             >
@@ -210,7 +204,6 @@ export default function AddQuestion() {
               Chapter
             </label>
             <select
-              id="inputState"
               className="form-select"
               onChange={(e) => setChapter(e.target.value)}
             >
@@ -400,7 +393,6 @@ export default function AddQuestion() {
               Correct Option
             </label>
             <select
-              id="inputState"
               className="form-select"
               onChange={(e) => setCorrect(e.target.value)}
             >

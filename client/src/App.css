@@ -227,6 +227,10 @@ i {
 }
 
 /* Login */
+.modal-body {
+  background-image: linear-gradient(#eaf2ff, #7a9cce);
+}
+
 .google {
   display: flex !important;
   margin: 10px auto;
@@ -245,6 +249,25 @@ i {
   border-radius: 50%;
 }
 
-/* input[type="file"] {
+.upload-btn-wrapper {
+  position: relative;
   overflow: hidden;
-} */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.upload-btn-wrapper input[type="file"] {
+  font-size: 100px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: 0;
+}
+
+.icon {
+  font-size: 16px !important;
+  margin-right: 10px;
+  margin-bottom: 0px !important;
+  margin-top: 0px !important;
+}

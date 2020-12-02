@@ -33,6 +33,11 @@ export default function Login() {
             </label>
             <input type="password" className="form-control" id="password" />
           </div>
+          <div className="mb-3 col-md-8">
+            <button type="button" className="btn btn-primary">
+              Login
+            </button>
+          </div>
         </form>
       </div>
     </>
