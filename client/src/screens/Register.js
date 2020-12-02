@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "../App.css";
 import { GoogleLogin } from "react-google-login";
+import { useHistory } from "react-router-dom";
 
 const firebase = require("firebase");
 const storageRef = firebase.storage().ref();
@@ -12,6 +13,7 @@ export default function Register() {
   const [email, setEmail] = useState(null);
   const [password, setPassword] = useState(null);
   const [imageUrl, setImageUrl] = useState(null);
+  const history = useHistory();
 
   useEffect(() => {
     if (pic) {
@@ -22,6 +24,28 @@ export default function Register() {
       reader.readAsDataURL(pic);
     }
   }, [pic]);
+
+  const registerUser = () => {
+    if (name && email && password) {
+      fetch("/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          password,
+          pic: imageUrl,
+        }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          alert(data.message);
+        })
+        .catch((err) => alert(err.message));
+    }
+  };
 
   const register = () => {
     if (pic && email && name) {
@@ -41,8 +65,14 @@ export default function Register() {
               alert(error.code);
             });
         });
+    } else {
+      registerUser();
     }
   };
+
+  useEffect(() => {
+    if (imageUrl) registerUser();
+  }, [imageUrl]);
 
   const responseGoogle = (response) => {
     console.log(response);

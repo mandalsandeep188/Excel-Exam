@@ -19,10 +19,12 @@ mongoose.connection.on("error", (err) => {
 });
 
 require("./models/question");
+require("./models/users");
 
 app.use(express.json());
 
 app.use(require("./routes/question"));
+app.use(require("./routes/auth"));
 
 app.listen(PORT, () => {
   console.log("Server is running at port: " + PORT);

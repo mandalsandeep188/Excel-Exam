@@ -128,7 +128,6 @@ export default function AddQuestion() {
 
   useEffect(() => {
     if (question.search("https://") !== -1) {
-      console.log("enter");
       addQuestionField();
     }
   }, [question]);
