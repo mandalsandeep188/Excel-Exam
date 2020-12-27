@@ -1,12 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import "../App.css";
 import { GoogleLogin } from "react-google-login";
 import { useHistory } from "react-router-dom";
+import { UserContext } from "../App";
+import { Modal } from "bootstrap";
 
 const firebase = require("firebase");
 const storageRef = firebase.storage().ref();
 
 export default function Register() {
+  const { user, changeUser } = useContext(UserContext);
   const [pic, setPic] = useState(null);
   const [imagePreview, setImagePreview] = useState("user.jpeg");
   const [name, setName] = useState(null);
@@ -25,6 +28,14 @@ export default function Register() {
     }
   }, [pic]);
 
+  const toggleModal = () => {
+    // let myModal = new Modal(document.getElementById("login"), {
+    //   keyboard: false,
+    // });
+    // console.log(myModal);
+    // myModal.hide();
+  };
+
   const registerUser = () => {
     if (name && email && password) {
       fetch("/register", {
@@ -41,7 +52,11 @@ export default function Register() {
       })
         .then((res) => res.json())
         .then((data) => {
+          localStorage.setItem("jwt", data.token);
+          localStorage.setItem("user", JSON.stringify(data.user));
+          changeUser({ type: "LOGIN", payload: data.user });
           alert(data.message);
+          toggleModal();
         })
         .catch((err) => alert(err.message));
     }
@@ -75,7 +90,16 @@ export default function Register() {
   }, [imageUrl]);
 
   const responseGoogle = (response) => {
-    console.log(response);
+    let profileObj = response.profileObj;
+    let googleUser = {
+      _id: profileObj.googleId,
+      email: profileObj.email,
+      name: profileObj.name,
+      pic: profileObj.imageUrl,
+      from: "Google",
+    };
+    localStorage.setItem("user", JSON.stringify(googleUser));
+    changeUser({ type: "LOGIN", payload: googleUser });
   };
   return (
     <>

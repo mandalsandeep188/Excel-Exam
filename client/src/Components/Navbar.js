@@ -1,12 +1,15 @@
 import React from "react";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { Link } from "react-router-dom";
 import "../App.css";
 import Login from "../screens/Login";
 import Register from "../screens/Register";
+import { UserContext } from "../App";
+import { GoogleLogout } from "react-google-login";
 
 export default function Navbar() {
   const [buttonTarget, setbuttonTarget] = useState("");
+  const { user, changeUser } = useContext(UserContext);
   return (
     <>
       <nav className="navbar navbar-expand-lg navbar-light bg-light">
@@ -83,37 +86,64 @@ export default function Navbar() {
                   About
                 </Link>
               </li>
-              <li className="nav-item">
-                <Link
-                  className={`nav-link ${
-                    window.location.pathname === "/profile" ? "active" : ""
-                  }`}
-                  aria-current="page"
-                  to="/test"
-                >
-                  Profile
-                </Link>
-              </li>
-              <li className="nav-item">
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  data-toggle="modal"
-                  data-target="#login"
-                  onClick={() => setbuttonTarget("login")}
-                >
-                  Login
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-outline-primary"
-                  data-toggle="modal"
-                  data-target="#login"
-                  onClick={() => setbuttonTarget("register")}
-                >
-                  Register
-                </button>
-              </li>
+              {user ? (
+                <>
+                  <li className="nav-item">
+                    <Link
+                      className={`nav-link ${
+                        window.location.pathname === "/profile" ? "active" : ""
+                      }`}
+                      aria-current="page"
+                      to="/test"
+                    >
+                      Profile
+                    </Link>
+                  </li>
+                  <li className="nav-item">
+                    {user.from === "Google" ? (
+                      <GoogleLogout
+                        clientId="983080919072-n4hu753n78cgv7itkbiomp2g5n3cc51i.apps.googleusercontent.com"
+                        buttonText="Logout"
+                        onLogoutSuccess={() => changeUser({ type: "LOGOUT" })}
+                      ></GoogleLogout>
+                    ) : (
+                      <button
+                        type="button"
+                        className="btn btn-danger"
+                        onClick={() => {
+                          changeUser({ type: "LOGOUT" });
+                          localStorage.clear();
+                        }}
+                      >
+                        Logout
+                      </button>
+                    )}
+                  </li>
+                </>
+              ) : undefined}
+
+              {!user ? (
+                <li className="nav-item">
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    data-toggle="modal"
+                    data-target="#login"
+                    onClick={() => setbuttonTarget("login")}
+                  >
+                    Login
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-outline-primary"
+                    data-toggle="modal"
+                    data-target="#login"
+                    onClick={() => setbuttonTarget("register")}
+                  >
+                    Register
+                  </button>
+                </li>
+              ) : undefined}
             </ul>
           </div>
         </div>

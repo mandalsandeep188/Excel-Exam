@@ -1,7 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
+const jwt = require("jsonwebtoken");
 const User = mongoose.model("User");
+const { JWT_SECRET } = require("../config/key");
 
 router.post("/register", (req, res) => {
   const { name, email, password, pic } = req.body;
@@ -36,8 +38,36 @@ router.post("/register", (req, res) => {
 
   user
     .save()
-    .then(() => {
-      res.json({ message: "Registered successfully" });
+    .then((data) => {
+      const token = jwt.sign({ _id: data._id }, JWT_SECRET);
+      const { _id, name, email, pic } = data;
+      res.json({
+        token,
+        user: { _id, name, email, pic },
+        message: "Registered successfully",
+      });
+    })
+    .catch((err) => console.log(err));
+});
+
+router.post("/login", (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password) {
+    return res.status(422).json({ err: "Please fill all fields" });
+  }
+
+  User.findOne({ email })
+    .then((saveduser) => {
+      if (!saveduser) {
+        return res.status(422).json({ error: "Invalid Email or password" });
+      }
+      if (saveduser.password === password) {
+        const token = jwt.sign({ _id: saveduser._id }, JWT_SECRET);
+        const { _id, name, email, pic } = saveduser;
+        res.json({ token, user: { _id, name, email, pic } });
+      } else {
+        return res.status(422).json({ error: "Invalid Email or password" });
+      }
     })
     .catch((err) => console.log(err));
 });

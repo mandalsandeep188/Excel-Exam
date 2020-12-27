@@ -1,11 +1,57 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import "../App.css";
 import { GoogleLogin } from "react-google-login";
+import { useHistory } from "react-router-dom";
+import { UserContext } from "../App";
+import { Modal } from "bootstrap";
 
 export default function Login() {
-  const responseGoogle = (response) => {
-    console.log(response);
+  const { user, changeUser } = useContext(UserContext);
+  const [email, setEmail] = useState(null);
+  const [password, setPassword] = useState(null);
+  const history = useHistory();
+
+  const toggleModal = () => {
+    // let myModal = new Modal(document.getElementById("login"), {});
+    // console.log("modal", myModal);
+    // myModal.hide();
   };
+
+  const loginUser = () => {
+    fetch("/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email,
+        password,
+      }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        localStorage.setItem("jwt", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user));
+        changeUser({ type: "LOGIN", payload: data.user });
+        alert("Successfully logged in");
+        toggleModal();
+      })
+      .catch((err) => console.log(err));
+  };
+
+  const responseGoogle = (response) => {
+    let profileObj = response.profileObj;
+    let googleUser = {
+      _id: profileObj.googleId,
+      email: profileObj.email,
+      name: profileObj.name,
+      pic: profileObj.imageUrl,
+      from: "Google",
+    };
+    localStorage.setItem("user", JSON.stringify(googleUser));
+    changeUser({ type: "LOGIN", payload: googleUser });
+  };
+
   return (
     <>
       <GoogleLogin
@@ -25,16 +71,30 @@ export default function Login() {
             <label htmlFor="email" className="form-label">
               Email address
             </label>
-            <input type="email" className="form-control" id="email" />
+            <input
+              type="email"
+              className="form-control"
+              id="email"
+              onChange={(e) => setEmail(e.target.value)}
+            />
           </div>
           <div className="mb-3 col-md-8">
             <label htmlFor="password" className="form-label">
               Password
             </label>
-            <input type="password" className="form-control" id="password" />
+            <input
+              type="password"
+              className="form-control"
+              id="password"
+              onChange={(e) => setPassword(e.target.value)}
+            />
           </div>
           <div className="mb-3 col-md-8">
-            <button type="button" className="btn btn-primary">
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={() => loginUser()}
+            >
               Login
             </button>
           </div>
