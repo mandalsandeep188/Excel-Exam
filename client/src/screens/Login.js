@@ -4,11 +4,13 @@ import { GoogleLogin } from "react-google-login";
 import { useHistory } from "react-router-dom";
 import { UserContext } from "../App";
 import { Modal } from "bootstrap";
+import Toast from "../Components/Toast";
 
 export default function Login() {
   const { user, changeUser } = useContext(UserContext);
   const [email, setEmail] = useState(null);
   const [password, setPassword] = useState(null);
+  const [toast, setToast] = useState(null);
   const history = useHistory();
 
   const toggleModal = () => {
@@ -33,7 +35,7 @@ export default function Login() {
         localStorage.setItem("jwt", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
         changeUser({ type: "LOGIN", payload: data.user });
-        alert("Successfully logged in");
+        setToast({ message: "Successfully logged in", type: "success" });
         toggleModal();
       })
       .catch((err) => console.log(err));
@@ -54,6 +56,7 @@ export default function Login() {
 
   return (
     <>
+      {/* {toast ? <Toast message={toast.message} type={toast.type} /> : undefined} */}
       <GoogleLogin
         clientId="983080919072-n4hu753n78cgv7itkbiomp2g5n3cc51i.apps.googleusercontent.com"
         buttonText="Continue with Google"

@@ -200,10 +200,10 @@ i {
   margin-bottom: 10px;
 }
 .q-sub {
-  background-color: #31a2b8;
-  color: white;
   padding: 5px;
   margin-bottom: 10px;
+  border-top: 1px solid lightgray;
+  font-weight: bold;
 }
 .options {
   margin: 10px 20px;

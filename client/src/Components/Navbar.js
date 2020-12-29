@@ -48,7 +48,7 @@ export default function Navbar() {
                     window.location.pathname === "/practice" ? "active" : ""
                   }`}
                   aria-current="page"
-                  to="/test"
+                  to="/practice"
                 >
                   Practice
                 </Link>
@@ -94,13 +94,13 @@ export default function Navbar() {
                         window.location.pathname === "/profile" ? "active" : ""
                       }`}
                       aria-current="page"
-                      to="/test"
+                      to="/profile"
                     >
                       Profile
                     </Link>
                   </li>
                   <li className="nav-item">
-                    {user.from === "Google" ? (
+                    {user.from ? (
                       <GoogleLogout
                         clientId="983080919072-n4hu753n78cgv7itkbiomp2g5n3cc51i.apps.googleusercontent.com"
                         buttonText="Logout"

@@ -12,12 +12,12 @@ export default function Taketest() {
   const [maths, setMaths] = useState([]);
   const [questionNo, setQuestionNo] = useState(1);
   const [time, setTime] = useState("00 : 00 : 00");
+  const [answers, setAnswers] = useState({});
   const history = useHistory();
 
   useEffect(() => {
     window.addEventListener("beforeunload", function (e) {
       let confirmationMessage = "Are you sure you want to cancel test?";
-      // dispatch({ type: "TEST", payload: null });
 
       (e || window.event).returnValue = confirmationMessage; //Gecko + IE
       return confirmationMessage; //Webkit, Safari, Chrome
@@ -76,9 +76,25 @@ export default function Taketest() {
     setQuestionNo(i + 1);
   };
 
+  const selectAnswer = (answer) => {
+    let ans = { ...answers };
+    ans[`${questionNo - 1}`] = answer;
+    setAnswers(ans);
+  };
+
+  const submitTest = () => {
+    console.log(answers);
+    dispatch({ type: "TEST", payload: { ...state, answers } });
+    history.push("/result");
+  };
+
   return (
     <>
-      <Prompt when={true} message="Are you sure you want to cancel test?" />
+      <Prompt
+        when={true}
+        message="Are you sure you want to cancel test?"
+        // onConfirm={dispatch({ type: "TEST", payload: null })}
+      />
       <nav className="navbar navbar-expand-lg navbar-light bg-light">
         <div className="container-fluid">
           <Link className="navbar-brand" to="/">
@@ -220,6 +236,13 @@ export default function Taketest() {
                       id="optionA"
                       autoComplete="off"
                       value="Option A"
+                      onChange={(e) => selectAnswer(e.target.value)}
+                      checked={
+                        answers[`${questionNo - 1}`] &&
+                        answers[`${questionNo - 1}`] === "Option A"
+                          ? true
+                          : false
+                      }
                     />
                     <label
                       className="btn btn-outline-primary check-opt"
@@ -236,6 +259,13 @@ export default function Taketest() {
                       id="optionB"
                       autoComplete="off"
                       value="Option B"
+                      onChange={(e) => selectAnswer(e.target.value)}
+                      checked={
+                        answers[`${questionNo - 1}`] &&
+                        answers[`${questionNo - 1}`] === "Option B"
+                          ? true
+                          : false
+                      }
                     />
                     <label
                       className="btn btn-outline-primary check-opt"
@@ -252,6 +282,13 @@ export default function Taketest() {
                       id="optionC"
                       autoComplete="off"
                       value="Option C"
+                      onChange={(e) => selectAnswer(e.target.value)}
+                      checked={
+                        answers[`${questionNo - 1}`] &&
+                        answers[`${questionNo - 1}`] === "Option C"
+                          ? true
+                          : false
+                      }
                     />
                     <label
                       className="btn btn-outline-primary check-opt"
@@ -268,6 +305,13 @@ export default function Taketest() {
                       id="optionD"
                       autoComplete="off"
                       value="Option D"
+                      onChange={(e) => selectAnswer(e.target.value)}
+                      checked={
+                        answers[`${questionNo - 1}`] &&
+                        answers[`${questionNo - 1}`] === "Option D"
+                          ? true
+                          : false
+                      }
                     />
                     <label
                       className="btn btn-outline-primary check-opt"
@@ -278,28 +322,40 @@ export default function Taketest() {
                   </div>
                 </div>
                 <div className="col-md-12 justify-content-between d-flex">
-                  <button
-                    type="button"
-                    className="btn btn-info prev"
-                    onClick={() => {
-                      if (questionNo - 2 >= 0) {
-                        selectedQuestion(questionNo - 2);
-                      }
-                    }}
-                  >
-                    Previous
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-info next"
-                    onClick={() => {
-                      if (questionNo < questions.length) {
-                        selectedQuestion(questionNo);
-                      }
-                    }}
-                  >
-                    Next
-                  </button>
+                  {questionNo > 1 ? (
+                    <button
+                      type="button"
+                      className="btn btn-info prev"
+                      onClick={() => {
+                        if (questionNo - 2 >= 0) {
+                          selectedQuestion(questionNo - 2);
+                        }
+                      }}
+                    >
+                      Previous
+                    </button>
+                  ) : undefined}
+                  {questionNo < questions.length ? (
+                    <button
+                      type="button"
+                      className="btn btn-info next"
+                      onClick={() => {
+                        if (questionNo < questions.length) {
+                          selectedQuestion(questionNo);
+                        }
+                      }}
+                    >
+                      Next
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      className="btn btn-success next"
+                      onClick={() => submitTest()}
+                    >
+                      Submit
+                    </button>
+                  )}
                 </div>
               </>
             ) : undefined}
