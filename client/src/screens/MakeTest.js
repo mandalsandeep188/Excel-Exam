@@ -240,34 +240,42 @@ export default function MakeTest() {
             )}
           </div>
           <div className="col-9 questions-list">
-            {questions.map((ques) => {
-              return (
-                <div key={ques._id}>
-                  <div className="form-check form-check">
-                    <input
-                      className="form-check-input"
-                      type="checkbox"
-                      id={ques._id}
-                      value={ques._id}
-                      onChange={(e) => {
-                        selectQuestion(e);
-                      }}
-                      checked={selectedQuestions.includes(ques._id)}
-                    />
-                    <label className="form-check-label" htmlFor={ques._id}>
-                      {ques.question.search("https://") !== -1 ? (
-                        <img
-                          className="ques-show-img img-fluid"
-                          src={ques.question}
-                        />
-                      ) : (
-                        <p className="ques-show-p">{ques.question}</p>
-                      )}
-                    </label>
+            {questions.length > 0 ? (
+              questions.map((ques) => {
+                return (
+                  <div key={ques._id}>
+                    <div className="form-check form-check">
+                      <input
+                        className="form-check-input"
+                        type="checkbox"
+                        id={ques._id}
+                        value={ques._id}
+                        onChange={(e) => {
+                          selectQuestion(e);
+                        }}
+                        checked={selectedQuestions.includes(ques._id)}
+                      />
+                      <label className="form-check-label" htmlFor={ques._id}>
+                        {ques.question.search("https://") !== -1 ? (
+                          <img
+                            className="ques-show-img img-fluid"
+                            src={ques.question}
+                          />
+                        ) : (
+                          <p className="ques-show-p">{ques.question}</p>
+                        )}
+                      </label>
+                    </div>
                   </div>
+                );
+              })
+            ) : (
+              <div class="d-flex justify-content-center">
+                <div class="spinner-grow text-primary" role="status">
+                  {/* <span class="visually-hidden">Loading...</span> */}
                 </div>
-              );
-            })}
+              </div>
+            )}
           </div>
         </div>
       </div>

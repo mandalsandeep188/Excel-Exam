@@ -1,6 +1,18 @@
+html {
+  position: relative;
+  min-height: 100%;
+}
 body {
   font-family: "Roboto", sans-serif;
   background-color: #e0e9f7;
+}
+#root {
+  margin-bottom: 83px;
+}
+
+a {
+  text-decoration: none;
+  color: black;
 }
 
 /* Scrollbar CSS */
@@ -12,11 +24,14 @@ body {
 /* Track */
 ::-webkit-scrollbar-track {
   background: #f1f1f1;
+  border: 1px solid gray;
+  border-radius: 8px;
 }
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
   background: #888;
+  border-radius: 8px;
 }
 
 /* Handle on hover */
@@ -88,6 +103,10 @@ body {
   padding: 20px;
   border-radius: 86% 14% 90% 10% / 6% 89% 11% 94%;
 }
+.services a {
+  color: black;
+  text-decoration: none;
+}
 
 .services h1 {
   margin-bottom: 40px;
@@ -99,6 +118,7 @@ body {
   box-shadow: 1px 0px 16px 2px #afafaf8c;
   border: 0;
   margin: 5%;
+  cursor: pointer;
 }
 .service-card:hover {
   box-shadow: 0px 9px 32px 18px #a1a1a18c;
@@ -109,6 +129,52 @@ body {
 i {
   font-size: 60px !important;
   margin-bottom: 10px;
+}
+
+/* footer  */
+.footer {
+  background-color: lightgray;
+  border-top: 1px solid rgb(168, 166, 166);
+  padding: 15px 30px;
+  padding-top: 35px;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 83px;
+  width: 100%;
+  overflow: hidden;
+  text-align: center;
+}
+
+/* social icons */
+footer .social-icons a {
+  color: white;
+  margin-right: 10px;
+  border-radius: 50%;
+  height: 32px;
+  width: 32px;
+  padding: 5px;
+  padding-top: 8px;
+}
+footer .social-icons a i {
+  border: 1px solid transparent;
+  font-size: 20px !important;
+  text-align: center;
+}
+.fb {
+  background-color: #3a5998;
+}
+.twt {
+  background-color: #00aced;
+}
+.git {
+  background-color: black;
+}
+.insta {
+  background-color: #c84e90;
+}
+.in {
+  background-color: #006699;
 }
 
 /* add question */
@@ -144,6 +210,7 @@ i {
   border-radius: 8px;
   box-shadow: 1px 0px 16px 2px #afafaf8c;
   scrollbar-width: 0px;
+  height: fit-content;
 }
 .filter label {
   font-size: 13px;
@@ -270,4 +337,48 @@ i {
   margin-right: 10px;
   margin-bottom: 0px !important;
   margin-top: 0px !important;
+}
+
+/* Profile  */
+.profile-pic {
+  height: 250px !important;
+}
+
+.user-info i {
+  font-size: 30px !important;
+  margin-right: 10px;
+}
+.tab {
+  /* min-height:50px; */
+  width: 100%;
+  padding: 25px;
+  font-family: sans-serif;
+  color: #444;
+}
+
+ul.inline {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 0;
+  -webkit-margin-before: 0;
+  -webkit-margin-after: 0;
+  -webkit-margin-start: 0px;
+  -webkit-margin-end: 0px;
+  -webkit-padding-start: 0px;
+}
+.inline li {
+  display: inline-block;
+  margin-left: 0;
+  padding: 10px;
+  border-bottom: 2px solid #eee;
+  transition: all 0.5s;
+  font-family: sans-serif;
+  font-weight: 300;
+  cursor: pointer;
+  color: #aaa;
+}
+
+.inline .selected {
+  border-bottom: 2px solid #337ab7;
+  color: #444;
 }

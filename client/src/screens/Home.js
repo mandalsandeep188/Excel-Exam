@@ -1,7 +1,6 @@
-import React, { useEffect, useContext } from "react";
-import { Link } from "react-router-dom";
+import React from "react";
 import "../App.css";
-import Service from "../Components/Service";
+import Service from "../components/Service";
 import firebaseConfig from "../constants/firebase";
 
 const firebase = require("firebase");
@@ -36,6 +35,7 @@ export default function Home() {
             description="Take online tests in environment same as exams with proper
                   time limit and question structure. Questions are close as exam
                   types and some previous year questions."
+            path="/test"
           />
           <Service
             icon="line-chart"
@@ -43,6 +43,7 @@ export default function Home() {
             description="Make your own tests with choice of number of questions and
                     time limit. You can practice anytime from your selected
                     chapters,subject, or class to excel in each aspects of exam."
+            path="/practice"
           />
           <Service
             icon="pie-chart"
@@ -50,6 +51,7 @@ export default function Home() {
             description="We record your progress and give proper analysis of each test
                     so that your improvement can be visible to you. Your profile
                     have all your test results with progress report."
+            path="/profile"
           />
         </div>
         {/* TODO: 1. Typing test with a vector 

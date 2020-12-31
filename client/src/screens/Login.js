@@ -4,7 +4,7 @@ import { GoogleLogin } from "react-google-login";
 import { useHistory } from "react-router-dom";
 import { UserContext } from "../App";
 import { Modal } from "bootstrap";
-import Toast from "../Components/Toast";
+import Toast from "../components/Toast";
 
 export default function Login() {
   const { user, changeUser } = useContext(UserContext);
