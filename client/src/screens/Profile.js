@@ -36,7 +36,7 @@ export default function Profile() {
             </Tabs>
           </div>
         ) : (
-          <div className="text-center">
+          <div class="loader">
             <div class="spinner-grow text-primary" role="status"></div>
           </div>
         )}

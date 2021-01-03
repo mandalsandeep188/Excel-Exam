@@ -14,6 +14,9 @@ export default function MakeTest() {
   const [questions, setQuestions] = useState([]);
   const [selectedQuestions, setSelectedQuestions] = useState([]);
   const [selectedChapter, setSelectedChapter] = useState([]);
+  const [title, setTitle] = useState(null);
+  const [date, setDate] = useState(null);
+  const [time, setTime] = useState(null);
   const history = useHistory();
 
   const addClass = (e) => {
@@ -51,6 +54,22 @@ export default function MakeTest() {
   };
 
   useEffect(() => {
+    if (standard.length !== 0 && subject.length !== 0) {
+      if (selectedChapter.length === 0) {
+        let array = questionsFetched.filter((ques) => {
+          if (
+            subject.includes(ques.subject) &&
+            standard.includes(ques.standard)
+          ) {
+            return ques;
+          }
+        });
+        setQuestions(array);
+      }
+    } else {
+      setQuestions(questionsFetched);
+    }
+
     if (subject && standard) {
       let array = [];
       if (standard.includes("11th")) {
@@ -106,20 +125,53 @@ export default function MakeTest() {
     }
   }, [selectedChapter]);
 
-  const makeTest = () => {
-    let quesList = [];
-    questionsFetched.forEach((question) => {
-      if (selectedQuestions.includes(question._id)) {
-        quesList.push(question);
+  useEffect(() => {
+    if (subject.length === 0 && standard.length !== 0) {
+      if (selectedChapter.length === 0) {
+        let array = questionsFetched.filter((ques) => {
+          if (standard.includes(ques.standard)) {
+            return ques;
+          }
+        });
+        setQuestions(array);
       }
-    });
-    dispatch({
-      type: "TEST",
-      payload: {
-        selectedQuestions: quesList,
+    } else if (standard.length === 0 && subject.length === 0) {
+      setQuestions(questionsFetched);
+    }
+  }, [standard]);
+
+  useEffect(() => {
+    if (standard.length === 0 && subject.length !== 0) {
+      if (selectedChapter.length === 0) {
+        let array = questionsFetched.filter((ques) => {
+          if (subject.includes(ques.subject)) {
+            return ques;
+          }
+        });
+        setQuestions(array);
+      }
+    } else if (standard.length === 0 && subject.length === 0) {
+      setQuestions(questionsFetched);
+    }
+  }, [subject]);
+
+  const makeTest = () => {
+    fetch("/maketest", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
       },
-    });
-    history.push("/taketest");
+      body: JSON.stringify({
+        questions: selectedQuestions,
+        title,
+        startTime: date + " " + time,
+      }),
+    })
+      .then(() => {
+        alert("Test Created Successfully");
+        history.push("/");
+      })
+      .catch((err) => console.log(err));
   };
 
   return (
@@ -131,13 +183,46 @@ export default function MakeTest() {
               No. of Questions selected: {selectedQuestions.length}
             </p>
             {selectedQuestions.length > 0 ? (
-              <button
-                type="submit"
-                className="btn btn-primary"
-                onClick={() => makeTest()}
-              >
-                Create Test
-              </button>
+              <form>
+                <div className="mb-3">
+                  <label htmlFor="testTitle" className="form-label">
+                    Test Title
+                  </label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="textTitle"
+                    onChange={(e) => setTitle(e.target.value)}
+                  />
+                </div>
+                <div className="mb-3">
+                  <label htmlFor="date" className="form-label">
+                    Start Time
+                  </label>
+                  <input
+                    type="date"
+                    className="form-control"
+                    id="date"
+                    onChange={(e) => setDate(e.target.value)}
+                  />
+                  <input
+                    type="time"
+                    className="form-control"
+                    id="time"
+                    onChange={(e) => setTime(e.target.value)}
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    makeTest();
+                  }}
+                >
+                  Create Test
+                </button>
+              </form>
             ) : undefined}
             <hr />
             <h5 className="mt-1">Class</h5>
@@ -270,10 +355,11 @@ export default function MakeTest() {
                 );
               })
             ) : (
-              <div class="d-flex justify-content-center">
-                <div class="spinner-grow text-primary" role="status">
-                  {/* <span class="visually-hidden">Loading...</span> */}
-                </div>
+              <div className="d-flex justify-content-center loader">
+                <div
+                  className="spinner-border text-primary"
+                  role="status"
+                ></div>
               </div>
             )}
           </div>

@@ -16,12 +16,6 @@ export default function Taketest() {
   const history = useHistory();
 
   useEffect(() => {
-    window.addEventListener("beforeunload", function (e) {
-      let confirmationMessage = "Are you sure you want to cancel test?";
-
-      (e || window.event).returnValue = confirmationMessage; //Gecko + IE
-      return confirmationMessage; //Webkit, Safari, Chrome
-    });
     if (state) {
       let chem = [];
       let phy = [];
@@ -39,6 +33,13 @@ export default function Taketest() {
       setDisplayQuestion(arr[0]);
       let perQuestionTime = 2;
       setTimer(arr.length * perQuestionTime);
+
+      window.addEventListener("beforeunload", function (e) {
+        let confirmationMessage = "Are you sure you want to cancel test?";
+
+        (e || window.event).returnValue = confirmationMessage; //Gecko + IE
+        return confirmationMessage; //Webkit, Safari, Chrome
+      });
     }
   }, []);
 

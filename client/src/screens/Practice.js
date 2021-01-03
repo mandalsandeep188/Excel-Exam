@@ -9,7 +9,6 @@ export default function Practice() {
   const [subject, setSubject] = useState([]);
   const [standard, setStandard] = useState([]);
   const [chapter, setChapter] = useState([]);
-  const [questions, setQuestions] = useState([]);
   const [selectedChapter, setSelectedChapter] = useState([]);
   const [noOfQuestions, setNoOfQuestions] = useState(0);
   const history = useHistory();
@@ -202,19 +201,19 @@ export default function Practice() {
             )}
             <hr />
             <div className="row g-3">
-              <label for="number" class="col-sm-2 col-form-label">
+              <label htmlFor="number" className="col-sm-2 col-form-label">
                 No. of questions
               </label>
-              <div class="col-md-2">
+              <div className="col-md-2">
                 <input
                   type="number"
-                  class="form-control"
+                  className="form-control"
                   id="number"
                   onChange={(e) => setNoOfQuestions(e.target.value)}
                 />
               </div>
 
-              <div class="col-md-7">
+              <div className="col-md-7">
                 <button
                   type="submit"
                   className="btn btn-primary"

@@ -20,6 +20,7 @@ mongoose.connection.on("error", (err) => {
 
 require("./models/question");
 require("./models/users");
+require("./models/test");
 
 app.use(express.json());
 

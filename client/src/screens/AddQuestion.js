@@ -34,6 +34,7 @@ export default function AddQuestion() {
   const [completedCrop, setCompletedCrop] = useState(null);
   const [questionImage, setQuestionImage] = useState(null);
   const [cropedImage, setCropedImage] = useState(null);
+  const [loader, setLoader] = useState(false);
   const history = useHistory();
 
   const onSelectFile = (e) => {
@@ -98,6 +99,7 @@ export default function AddQuestion() {
   }, [standard, subject]);
 
   const addQuestionField = () => {
+    setLoader(true);
     fetch("/addQuestion", {
       method: "post",
       headers: {
@@ -121,7 +123,7 @@ export default function AddQuestion() {
           return alert(data.err);
         }
         alert("Question added successfully");
-        window.location.reload();
+        setLoader(false);
       })
       .catch((err) => alert(err));
   };
@@ -162,6 +164,11 @@ export default function AddQuestion() {
 
   return (
     <>
+      {loader ? (
+        <div className="d-flex justify-content-center loader">
+          <div className="spinner-border text-primary" role="status"></div>
+        </div>
+      ) : undefined}
       <div className="container add-form">
         <h1 className="mt-5 mb-4">Add a question</h1>
         <form

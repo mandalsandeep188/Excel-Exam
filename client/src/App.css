@@ -375,10 +375,38 @@ ul.inline {
   font-family: sans-serif;
   font-weight: 300;
   cursor: pointer;
-  color: #aaa;
+  color: rgb(153, 152, 152);
 }
 
 .inline .selected {
   border-bottom: 2px solid #337ab7;
   color: #444;
+}
+
+hr {
+  margin-bottom: 0 !important;
+}
+
+.loader {
+  position: fixed;
+  top: 40%;
+  left: 50%;
+}
+
+/* Test  */
+.test-card {
+  background-color: #eaf2ff;
+  border-radius: 8px;
+  box-shadow: 1px 0px 16px 2px #afafaf8c;
+  border: 0;
+}
+
+.test-icon {
+  font-size: 80px !important;
+}
+
+.time-icon {
+  font-size: 20px !important;
+  margin-right: 7px;
+  margin-left: 7px;
 }

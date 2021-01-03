@@ -90,16 +90,20 @@ export default function Register() {
   }, [imageUrl]);
 
   const responseGoogle = (response) => {
-    let profileObj = response.profileObj;
-    let googleUser = {
-      _id: profileObj.googleId,
-      email: profileObj.email,
-      name: profileObj.name,
-      pic: profileObj.imageUrl,
-      from: "Google",
-    };
-    localStorage.setItem("user", JSON.stringify(googleUser));
-    changeUser({ type: "LOGIN", payload: googleUser });
+    try {
+      let profileObj = response.profileObj;
+      let googleUser = {
+        _id: profileObj.googleId,
+        email: profileObj.email,
+        name: profileObj.name,
+        pic: profileObj.imageUrl,
+        from: "Google",
+      };
+      localStorage.setItem("user", JSON.stringify(googleUser));
+      changeUser({ type: "LOGIN", payload: googleUser });
+    } catch (err) {
+      console.log(err);
+    }
   };
   return (
     <>

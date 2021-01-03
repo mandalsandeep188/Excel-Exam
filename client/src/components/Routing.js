@@ -9,20 +9,19 @@ import Navbar from "./Navbar";
 import Taketest from "../screens/TakeTest";
 import Profile from "../screens/Profile";
 import Result from "../screens/Result";
+import TestOnTime from "../screens/TestOnTime";
 import { UserContext, QuestionContext } from "../App";
 import Practice from "../screens/Practice";
 import Footer from "./Footer";
 
 export default function Routing() {
   const history = useHistory();
-  const { changeUser } = useContext(UserContext);
+  const { user, changeUser } = useContext(UserContext);
   const { state } = useContext(QuestionContext);
-  useEffect(() => {
+  useEffect(async () => {
     const user = JSON.parse(localStorage.getItem("user"));
     if (user) {
-      changeUser({ type: "LOGIN", payload: user });
-    } else {
-      history.push("/");
+      await changeUser({ type: "LOGIN", payload: user });
     }
   }, []);
   return (
@@ -43,12 +42,26 @@ export default function Routing() {
         <Footer />
       </Route>
       <Route path="/profile">
-        <Navbar />
-        <Profile />
-        <Footer />
+        {user ? (
+          <>
+            <Navbar />
+            <Profile />
+            <Footer />
+          </>
+        ) : (
+          <Redirect to="/" />
+        )}
       </Route>
       <Route path="/taketest">
-        <Taketest />
+        {state ? (
+          state.startTime ? (
+            <TestOnTime />
+          ) : (
+            <Taketest />
+          )
+        ) : (
+          <Redirect to="/" />
+        )}
       </Route>
       <Route path="/result">
         <Navbar />
