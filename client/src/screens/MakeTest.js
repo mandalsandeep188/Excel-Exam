@@ -176,9 +176,9 @@ export default function MakeTest() {
 
   return (
     <>
-      <div className="container-fluid my-4">
+      <div className="container my-4">
         <div className="row">
-          <div className="col-3 filter">
+          <div className="col-md-4 filter">
             <p className="mt-1">
               No. of Questions selected: {selectedQuestions.length}
             </p>
@@ -324,7 +324,7 @@ export default function MakeTest() {
               <p>Select class and subjects to select chapters</p>
             )}
           </div>
-          <div className="col-9 questions-list">
+          <div className="col-md-8">
             {questions.length > 0 ? (
               questions.map((ques) => {
                 return (

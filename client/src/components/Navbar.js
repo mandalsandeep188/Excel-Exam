@@ -75,17 +75,6 @@ export default function Navbar() {
                   Make Test
                 </Link>
               </li>
-              <li className="nav-item">
-                <Link
-                  className={`nav-link ${
-                    window.location.pathname === "/about" ? "active" : ""
-                  }`}
-                  aria-current="page"
-                  to="/test"
-                >
-                  About
-                </Link>
-              </li>
               {user ? (
                 <>
                   <li className="nav-item">
@@ -101,11 +90,24 @@ export default function Navbar() {
                   </li>
                   <li className="nav-item">
                     {user.from ? (
-                      <GoogleLogout
-                        clientId="983080919072-n4hu753n78cgv7itkbiomp2g5n3cc51i.apps.googleusercontent.com"
-                        buttonText="Logout"
-                        onLogoutSuccess={() => changeUser({ type: "LOGOUT" })}
-                      ></GoogleLogout>
+                      user.from === "Google" ? (
+                        <GoogleLogout
+                          clientId="983080919072-n4hu753n78cgv7itkbiomp2g5n3cc51i.apps.googleusercontent.com"
+                          buttonText="Logout"
+                          onLogoutSuccess={() => changeUser({ type: "LOGOUT" })}
+                        ></GoogleLogout>
+                      ) : (
+                        <button
+                          className="facebook-button"
+                          style={{ width: "100%", marginTop: "0" }}
+                          onClick={() => {
+                            changeUser({ type: "LOGOUT" });
+                            localStorage.clear();
+                          }}
+                        >
+                          <i className="fa fa-facebook"></i> Logout
+                        </button>
+                      )
                     ) : (
                       <button
                         type="button"

@@ -1,7 +1,11 @@
 const mongoose = require("mongoose");
 const { ObjectID } = mongoose.Schema.Types;
 
-const questionSchema = new mongoose.Schema({
+const socialSchema = new mongoose.Schema({
+  id: {
+    type: String,
+    unique: true,
+  },
   name: {
     type: String,
     required: true,
@@ -14,10 +18,6 @@ const questionSchema = new mongoose.Schema({
     type: String,
     default: "user.jpeg",
   },
-  password: {
-    type: String,
-    required: true,
-  },
   type: {
     type: String,
     default: "student",
@@ -25,4 +25,4 @@ const questionSchema = new mongoose.Schema({
   results: [{ type: ObjectID, ref: "Result" }],
 });
 
-mongoose.model("User", questionSchema);
+mongoose.model("SocialUser", socialSchema);

@@ -43,6 +43,11 @@ export default function Taketest() {
     }
   }, []);
 
+  const submitTest = () => {
+    dispatch({ type: "TEST", payload: { ...state, answers } });
+    history.push("/result");
+  };
+
   const setTimer = (countDownTime) => {
     countDownTime *= 1000 * 60;
     countDownTime += new Date().getTime();
@@ -66,8 +71,9 @@ export default function Taketest() {
       // If the count down is finished
       if (distance < 0) {
         clearInterval(x);
-        alert("Time Ended!");
+        // alert("Time Ended!");
         setTime("00 : 00 : 00");
+        submitTest();
       }
     }, 1000);
   };
@@ -81,12 +87,6 @@ export default function Taketest() {
     let ans = { ...answers };
     ans[`${questionNo - 1}`] = answer;
     setAnswers(ans);
-  };
-
-  const submitTest = () => {
-    console.log(answers);
-    dispatch({ type: "TEST", payload: { ...state, answers } });
-    history.push("/result");
   };
 
   return (

@@ -3,6 +3,7 @@ const router = express.Router();
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const User = mongoose.model("User");
+const SocialUser = mongoose.model("SocialUser");
 const { JWT_SECRET } = require("../config/key");
 
 router.post("/register", (req, res) => {
@@ -68,6 +69,33 @@ router.post("/login", (req, res) => {
       } else {
         return res.status(422).json({ error: "Invalid Email or password" });
       }
+    })
+    .catch((err) => console.log(err));
+});
+
+router.post("/socialLogin", (req, res) => {
+  const { id, name, email, pic } = req.body;
+  if (!id || !name || !email || !pic) {
+    return res.status(422).json({ err: "Something went wrong" });
+  }
+
+  let user = new SocialUser({
+    id,
+    name,
+    email,
+    pic,
+  });
+
+  SocialUser.findOne({ id: id }).then((user) => {
+    if (user) {
+      return res.json({ error: "User already exists with that email" });
+    }
+  });
+
+  user
+    .save()
+    .then((data) => {
+      res.json({ _id: data._id });
     })
     .catch((err) => console.log(err));
 });

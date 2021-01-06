@@ -15,6 +15,13 @@ a {
   color: black;
 }
 
+/* Bootstrap button changes  */
+.btn:focus,
+.btn:active {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
 /* Scrollbar CSS */
 /* width */
 ::-webkit-scrollbar {
@@ -119,16 +126,18 @@ a {
   border: 0;
   margin: 5%;
   cursor: pointer;
+  min-width: 18rem;
+  min-height: 18rem;
+  text-align: justify;
 }
 .service-card:hover {
-  box-shadow: 0px 9px 32px 18px #a1a1a18c;
+  box-shadow: 0px 9px 20px 9px #a1a1a18c;
   transform: scale(1.05);
   transition: all 0.5s ease-in-out;
 }
 
 i {
-  font-size: 60px !important;
-  margin-bottom: 10px;
+  font-size: 80px !important;
 }
 
 /* footer  */
@@ -205,6 +214,9 @@ footer .social-icons a i {
 
 /* Make test */
 .filter {
+  position: sticky;
+  align-self: start;
+  top: 50px;
   padding: 15px 11px;
   background-color: #eaf2ff;
   border-radius: 8px;
@@ -215,10 +227,7 @@ footer .social-icons a i {
 .filter label {
   font-size: 13px;
 }
-.questions-list {
-  max-height: 900px;
-  overflow-y: auto;
-}
+
 .ques-show-p {
   background-color: white;
   border-radius: 8px;
@@ -303,6 +312,31 @@ footer .social-icons a i {
   margin: 10px auto;
   width: 40% !important;
   justify-content: center;
+  outline: none !important;
+}
+
+.facebook-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 10px auto;
+  width: 40%;
+  background: #4c69ba;
+  color: white;
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 2px 2px 0px,
+    rgba(0, 0, 0, 0.24) 0px 0px 1px 0px;
+  padding: 10px;
+  border-radius: 2px;
+  border: 1px solid transparent;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: Roboto, sans-serif;
+}
+
+.facebook-button i {
+  font-size: 20px !important;
+  margin-right: 20px;
+  margin-bottom: 0;
 }
 
 .login-form form div {
@@ -383,10 +417,6 @@ ul.inline {
   color: #444;
 }
 
-hr {
-  margin-bottom: 0 !important;
-}
-
 .loader {
   position: fixed;
   top: 40%;
@@ -409,4 +439,21 @@ hr {
   font-size: 20px !important;
   margin-right: 7px;
   margin-left: 7px;
+}
+
+/* Result */
+.check-ans {
+  color: white;
+  padding: 10px;
+  border: 1px solid transparent;
+  border-radius: 0.25rem;
+  display: inline-block;
+}
+.result-question {
+  background-color: #fff;
+  margin-left: 10px;
+  border-radius: 8px;
+  padding: 0;
+  min-height: 500px;
+  position: relative;
 }

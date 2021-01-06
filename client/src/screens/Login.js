@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import "../App.css";
 import { GoogleLogin } from "react-google-login";
+import FacebookLogin from "react-facebook-login";
 import { useHistory } from "react-router-dom";
 import { UserContext } from "../App";
 import { Modal } from "bootstrap";
@@ -45,7 +46,7 @@ export default function Login() {
     try {
       let profileObj = response.profileObj;
       let googleUser = {
-        _id: profileObj.googleId,
+        id: profileObj.googleId,
         email: profileObj.email,
         name: profileObj.name,
         pic: profileObj.imageUrl,
@@ -53,6 +54,54 @@ export default function Login() {
       };
       localStorage.setItem("user", JSON.stringify(googleUser));
       changeUser({ type: "LOGIN", payload: googleUser });
+      fetch("/socialLogin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: profileObj.googleId,
+          email: profileObj.email,
+          name: profileObj.name,
+          pic: profileObj.imageUrl,
+          from: "Google",
+        }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          let gUser = { ...googleUser, _id: data._id };
+          localStorage.setItem("user", JSON.stringify(gUser));
+          changeUser({ type: "LOGIN", payload: gUser });
+        });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const responseFacebook = (response) => {
+    try {
+      let facebookUser = {
+        id: response.userID,
+        email: response.email,
+        name: response.name,
+        pic: response.picture.data.url,
+        from: "Facebook",
+      };
+      fetch("/socialLogin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: response.userID,
+          email: response.email,
+          name: response.name,
+          pic: response.picture.data.url,
+          from: "Facebook",
+        }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          let fbUser = { ...facebookUser, _id: data._id };
+          localStorage.setItem("user", JSON.stringify(fbUser));
+          changeUser({ type: "LOGIN", payload: fbUser });
+        });
     } catch (err) {
       console.log(err);
     }
@@ -69,7 +118,14 @@ export default function Login() {
         cookiePolicy={"single_host_origin"}
         className="google"
       />
-      <h5 className="text-center">OR</h5>
+      <FacebookLogin
+        appId="863319710877687"
+        fields="name,email,picture"
+        callback={responseFacebook}
+        cssClass="facebook-button"
+        icon="fa-facebook"
+      />
+      ,<h5 className="text-center">OR</h5>
       <hr />
       <h3 className="my-3 text-center">Login to Excel Exam</h3>
       <div className="container login-form">

@@ -37,12 +37,12 @@ export default function Test() {
 
   return (
     <>
-      <div className="container my-3">
-        <div className="row">
+      <div className="container my-5">
+        <div className="row g-5">
           {tests.length > 0 ? (
             tests.map((test) => {
               return (
-                <div className="col-md-4 my-3" key={test._id}>
+                <div className="col-md-4 my-4" key={test._id}>
                   <div className="card test-card">
                     <div className="card-header">Test</div>
                     <div className="card-body">

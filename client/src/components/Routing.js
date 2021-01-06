@@ -18,10 +18,10 @@ export default function Routing() {
   const history = useHistory();
   const { user, changeUser } = useContext(UserContext);
   const { state } = useContext(QuestionContext);
-  useEffect(async () => {
+  useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
     if (user) {
-      await changeUser({ type: "LOGIN", payload: user });
+      changeUser({ type: "LOGIN", payload: user });
     }
   }, []);
   return (

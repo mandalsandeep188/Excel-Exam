@@ -2,6 +2,7 @@ import React from "react";
 import "../App.css";
 import Service from "../components/Service";
 import firebaseConfig from "../constants/firebase";
+import { Link } from "react-router-dom";
 
 const firebase = require("firebase");
 firebase.initializeApp(firebaseConfig);
@@ -19,9 +20,11 @@ export default function Home() {
               format. Make your own tests and track your progress to improve.
               So, start excelling exams today.
             </h6>
-            <button type="button" className="btn btn-primary">
-              Start Now
-            </button>
+            <Link to="/test">
+              <button type="button" className="btn btn-primary">
+                Start Now
+              </button>
+            </Link>
           </div>
           <div className="col-md-6 order-1">
             <img src="school.png" className="img-fluid"></img>
@@ -42,7 +45,7 @@ export default function Home() {
             title="Practice to Improve"
             description="Make your own tests with choice of number of questions and
                     time limit. You can practice anytime from your selected
-                    chapters,subject, or class to excel in each aspects of exam."
+                    chapters, subject, or class to excel in each aspects of exam."
             path="/practice"
           />
           <Service
