@@ -1,17 +1,23 @@
-import React from "react";
+import React, { useEffect, useContext } from "react";
 import "../App.css";
 import Service from "../components/Service";
 import firebaseConfig from "../constants/firebase";
 import { Link } from "react-router-dom";
+import { QuestionContext } from "../App";
 
-const firebase = require("firebase");
+const firebase = require("firebase/app");
 firebase.initializeApp(firebaseConfig);
+require("firebase/analytics");
 firebase.analytics();
 
 export default function Home() {
+  const { dispatch } = useContext(QuestionContext);
+  useEffect(() => {
+    dispatch({ type: "SUBMIT" });
+  }, [dispatch]);
   return (
     <>
-      <div className="container my-5">
+      <div className="container my-3">
         <div className="row">
           <div className="col-md-6 welcome order-2 order-lg-1">
             <h1>Welcome to Excel Exam</h1>
@@ -27,7 +33,11 @@ export default function Home() {
             </Link>
           </div>
           <div className="col-md-6 order-1">
-            <img src="school.png" className="img-fluid"></img>
+            <img
+              src="school.png"
+              className="img-fluid up-down"
+              alt="banner"
+            ></img>
           </div>
         </div>
         <div className="row services">

@@ -1,26 +1,19 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useContext } from "react";
 import "../App.css";
 import { GoogleLogin } from "react-google-login";
 import FacebookLogin from "react-facebook-login";
-import { useHistory } from "react-router-dom";
 import { UserContext } from "../App";
-import { Modal } from "bootstrap";
-import Toast from "../components/Toast";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-export default function Login() {
-  const { user, changeUser } = useContext(UserContext);
+export default function Login(props) {
+  const { changeUser } = useContext(UserContext);
   const [email, setEmail] = useState(null);
   const [password, setPassword] = useState(null);
-  const [toast, setToast] = useState(null);
-  const history = useHistory();
-
-  const toggleModal = () => {
-    // let myModal = new Modal(document.getElementById("login"), {});
-    // console.log("modal", myModal);
-    // myModal.hide();
-  };
+  const [loader, setLoader] = useState(false);
 
   const loginUser = () => {
+    setLoader(true);
     fetch("/login", {
       method: "POST",
       headers: {
@@ -33,13 +26,17 @@ export default function Login() {
     })
       .then((res) => res.json())
       .then((data) => {
-        localStorage.setItem("jwt", data.token);
-        localStorage.setItem("user", JSON.stringify(data.user));
-        changeUser({ type: "LOGIN", payload: data.user });
-        setToast({ message: "Successfully logged in", type: "success" });
-        toggleModal();
-      })
-      .catch((err) => console.log(err));
+        if (data.error) {
+          toast.error(data.error);
+        } else {
+          localStorage.setItem("jwt", data.token);
+          localStorage.setItem("user", JSON.stringify(data.user));
+          changeUser({ type: "LOGIN", payload: data.user });
+          setLoader(false);
+          props.modal();
+          toast.success("Logged in Successfully");
+        }
+      });
   };
 
   const responseGoogle = (response) => {
@@ -67,9 +64,11 @@ export default function Login() {
       })
         .then((res) => res.json())
         .then((data) => {
-          let gUser = { ...googleUser, _id: data._id };
+          let gUser = { ...googleUser, _id: data._id, type: data.type };
           localStorage.setItem("user", JSON.stringify(gUser));
           changeUser({ type: "LOGIN", payload: gUser });
+          props.modal();
+          toast.success("Logged in Successfully");
         });
     } catch (err) {
       console.log(err);
@@ -92,15 +91,17 @@ export default function Login() {
           id: response.userID,
           email: response.email,
           name: response.name,
-          pic: response.picture.data.url,
           from: "Facebook",
         }),
       })
         .then((res) => res.json())
         .then((data) => {
-          let fbUser = { ...facebookUser, _id: data._id };
+          console.log(data);
+          let fbUser = { ...facebookUser, _id: data._id, type: data.type };
           localStorage.setItem("user", JSON.stringify(fbUser));
           changeUser({ type: "LOGIN", payload: fbUser });
+          props.modal();
+          toast.success("Logged in Successfully");
         });
     } catch (err) {
       console.log(err);
@@ -109,7 +110,11 @@ export default function Login() {
 
   return (
     <>
-      {/* {toast ? <Toast message={toast.message} type={toast.type} /> : undefined} */}
+      {loader ? (
+        <div className="d-flex justify-content-center loader">
+          <div className="spinner-border text-primary" role="status"></div>
+        </div>
+      ) : undefined}
       <GoogleLogin
         clientId="983080919072-n4hu753n78cgv7itkbiomp2g5n3cc51i.apps.googleusercontent.com"
         buttonText="Continue with Google"
@@ -122,14 +127,22 @@ export default function Login() {
         appId="863319710877687"
         fields="name,email,picture"
         callback={responseFacebook}
+        onFailure={responseFacebook}
         cssClass="facebook-button"
+        size="metro"
         icon="fa-facebook"
       />
       ,<h5 className="text-center">OR</h5>
       <hr />
       <h3 className="my-3 text-center">Login to Excel Exam</h3>
       <div className="container login-form">
-        <form className="rows">
+        <form
+          className="rows"
+          onSubmit={(e) => {
+            e.preventDefault();
+            loginUser();
+          }}
+        >
           <div className="mb-3 col-md-8">
             <label htmlFor="email" className="form-label">
               Email address
@@ -139,6 +152,7 @@ export default function Login() {
               className="form-control"
               id="email"
               onChange={(e) => setEmail(e.target.value)}
+              required
             />
           </div>
           <div className="mb-3 col-md-8">
@@ -150,14 +164,11 @@ export default function Login() {
               className="form-control"
               id="password"
               onChange={(e) => setPassword(e.target.value)}
+              required
             />
           </div>
           <div className="mb-3 col-md-8">
-            <button
-              type="button"
-              className="btn btn-primary"
-              onClick={() => loginUser()}
-            >
+            <button type="submit" className="btn btn-primary">
               Login
             </button>
           </div>

@@ -52,7 +52,9 @@ router.post("/addQuestion", (req, res) => {
 });
 
 router.get("/fetchQuestions", (req, res) => {
-  Question.find().then((questions) => res.json(questions));
+  Question.find()
+    .sort("-createdAt")
+    .then((questions) => res.json(questions));
 });
 
 module.exports = router;

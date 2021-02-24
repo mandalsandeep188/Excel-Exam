@@ -8,7 +8,7 @@ export default function Footer() {
   };
   return (
     <div className="container-fluid footer">
-      <footer className="row">
+      <footer className="row g-3">
         <div className="col-md-8">
           <Link to="/">Excel Exam </Link>© {getYear()} - All rights reserved
         </div>

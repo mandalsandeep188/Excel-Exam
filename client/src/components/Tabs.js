@@ -7,7 +7,7 @@ export default function Tabs(props) {
     <div>
       <ul className="inline">
         {props.children.map((elem, index) => {
-          let style = index == selected ? "selected" : "";
+          let style = index === selected ? "selected" : "";
           return (
             <li
               className={style}

@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const { ObjectID } = mongoose.Schema.Types;
 
 const socialSchema = new mongoose.Schema({
   id: {
@@ -20,9 +19,8 @@ const socialSchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    default: "student",
+    default: "Student",
   },
-  results: [{ type: ObjectID, ref: "Result" }],
 });
 
 mongoose.model("SocialUser", socialSchema);

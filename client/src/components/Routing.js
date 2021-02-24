@@ -1,5 +1,5 @@
 import React, { useContext, useEffect } from "react";
-import { Switch, Route, useHistory, Redirect } from "react-router-dom";
+import { Switch, Route, Redirect } from "react-router-dom";
 import "../App.css";
 import Home from "../screens/Home";
 import Test from "../screens/Test";
@@ -12,10 +12,11 @@ import Result from "../screens/Result";
 import TestOnTime from "../screens/TestOnTime";
 import { UserContext, QuestionContext } from "../App";
 import Practice from "../screens/Practice";
+import Root from "../screens/Root";
 import Footer from "./Footer";
+import TestResults from "../screens/TestResults";
 
 export default function Routing() {
-  const history = useHistory();
   const { user, changeUser } = useContext(UserContext);
   const { state } = useContext(QuestionContext);
   useEffect(() => {
@@ -23,7 +24,7 @@ export default function Routing() {
     if (user) {
       changeUser({ type: "LOGIN", payload: user });
     }
-  }, []);
+  }, [changeUser]);
   return (
     <Switch>
       <Route path="/test">
@@ -37,9 +38,37 @@ export default function Routing() {
         <Footer />
       </Route>
       <Route path="/maketest">
-        <Navbar />
-        <MakeTest />
-        <Footer />
+        {user && user.type !== "Student" ? (
+          <>
+            <Navbar />
+            <MakeTest />
+            <Footer />
+          </>
+        ) : (
+          <Redirect to="/" />
+        )}
+      </Route>
+      <Route path="/testresults">
+        {user && user.type !== "Student" ? (
+          <>
+            <Navbar />
+            <TestResults />
+            <Footer />
+          </>
+        ) : (
+          <Redirect to="/" />
+        )}
+      </Route>
+      <Route path="/root">
+        {user && user.type === "Root" ? (
+          <>
+            <Navbar />
+            <Root />
+            <Footer />
+          </>
+        ) : (
+          <Redirect to="/" />
+        )}
       </Route>
       <Route path="/profile">
         {user ? (
@@ -64,9 +93,15 @@ export default function Routing() {
         )}
       </Route>
       <Route path="/result">
-        <Navbar />
-        <Result />
-        <Footer />
+        {state ? (
+          <>
+            <Navbar />
+            <Result />
+            <Footer />
+          </>
+        ) : (
+          <Redirect to="/" />
+        )}
       </Route>
       <Route path="/practice">
         <Navbar />

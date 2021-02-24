@@ -12,14 +12,6 @@ router.post("/register", (req, res) => {
     return res.status(422).json({ err: "Please fill all fields" });
   }
 
-  User.findOne({ email: email }).then((user) => {
-    if (user) {
-      return res
-        .status(422)
-        .json({ error: "User already exists with that email" });
-    }
-  });
-
   let user = null;
 
   if (pic) {
@@ -41,14 +33,25 @@ router.post("/register", (req, res) => {
     .save()
     .then((data) => {
       const token = jwt.sign({ _id: data._id }, JWT_SECRET);
-      const { _id, name, email, pic } = data;
+      const { _id, name, email, pic, type } = data;
       res.json({
         token,
-        user: { _id, name, email, pic },
+        user: { _id, name, email, pic, type },
         message: "Registered successfully",
       });
     })
     .catch((err) => console.log(err));
+});
+
+router.post("/checkEmail", (req, res) => {
+  const { email } = req.body;
+  User.findOne({ email: email }).then((user) => {
+    if (user) {
+      return res.json({ error: "User already exists with that email" });
+    } else {
+      return res.json({ error: null });
+    }
+  });
 });
 
 router.post("/login", (req, res) => {
@@ -64,8 +67,8 @@ router.post("/login", (req, res) => {
       }
       if (saveduser.password === password) {
         const token = jwt.sign({ _id: saveduser._id }, JWT_SECRET);
-        const { _id, name, email, pic } = saveduser;
-        res.json({ token, user: { _id, name, email, pic } });
+        const { _id, name, email, pic, type } = saveduser;
+        res.json({ token, user: { _id, name, email, pic, type } });
       } else {
         return res.status(422).json({ error: "Invalid Email or password" });
       }
@@ -75,29 +78,28 @@ router.post("/login", (req, res) => {
 
 router.post("/socialLogin", (req, res) => {
   const { id, name, email, pic } = req.body;
-  if (!id || !name || !email || !pic) {
+  if (!id || !name || !email) {
     return res.status(422).json({ err: "Something went wrong" });
   }
 
-  let user = new SocialUser({
-    id,
-    name,
-    email,
-    pic,
-  });
-
   SocialUser.findOne({ id: id }).then((user) => {
     if (user) {
-      return res.json({ error: "User already exists with that email" });
+      return res.json({ _id: user._id, type: user.type });
+    } else {
+      let usr = new SocialUser({
+        id,
+        name,
+        email,
+        pic,
+      });
+      usr
+        .save()
+        .then((data) => {
+          res.json({ _id: data._id, type: data.type });
+        })
+        .catch((err) => console.log(err));
     }
   });
-
-  user
-    .save()
-    .then((data) => {
-      res.json({ _id: data._id });
-    })
-    .catch((err) => console.log(err));
 });
 
 module.exports = router;

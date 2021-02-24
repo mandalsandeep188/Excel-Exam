@@ -21,6 +21,8 @@ router.post("/maketest", (req, res) => {
 router.get("/fetchTests", (req, res) => {
   Test.find()
     .populate("questions")
+    .populate("results", "user")
+    .sort("-createdAt")
     .then((data) => res.json(data))
     .catch((err) => res.json(err));
 });

@@ -3,6 +3,8 @@ import { useHistory } from "react-router-dom";
 import "../App.css";
 import chapters from "../constants/chapters";
 import { QuestionContext } from "../App";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 var questionsFetched = [];
 
@@ -103,6 +105,7 @@ export default function MakeTest() {
   }, [subject, standard]);
 
   useEffect(() => {
+    dispatch({ type: "SUBMIT" });
     fetch("/fetchQuestions")
       .then((result) => result.json())
       .then((data) => {
@@ -156,22 +159,26 @@ export default function MakeTest() {
   }, [subject]);
 
   const makeTest = () => {
-    fetch("/maketest", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        questions: selectedQuestions,
-        title,
-        startTime: date + " " + time,
-      }),
-    })
-      .then(() => {
-        alert("Test Created Successfully");
-        history.push("/");
+    if (title && date && time) {
+      fetch("/maketest", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          questions: selectedQuestions,
+          title,
+          startTime: date + " " + time,
+        }),
       })
-      .catch((err) => console.log(err));
+        .then(() => {
+          toast.success("Test Created Successfully");
+          history.push("/");
+        })
+        .catch((err) => console.log(err));
+    } else {
+      toast.error("Please fill all fields");
+    }
   };
 
   return (
@@ -193,6 +200,7 @@ export default function MakeTest() {
                     className="form-control"
                     id="textTitle"
                     onChange={(e) => setTitle(e.target.value)}
+                    required
                   />
                 </div>
                 <div className="mb-3">
@@ -204,12 +212,14 @@ export default function MakeTest() {
                     className="form-control"
                     id="date"
                     onChange={(e) => setDate(e.target.value)}
+                    required
                   />
                   <input
                     type="time"
                     className="form-control"
                     id="time"
                     onChange={(e) => setTime(e.target.value)}
+                    required
                   />
                 </div>
                 <button
@@ -345,6 +355,7 @@ export default function MakeTest() {
                           <img
                             className="ques-show-img img-fluid"
                             src={ques.question}
+                            alt="question"
                           />
                         ) : (
                           <p className="ques-show-p">{ques.question}</p>

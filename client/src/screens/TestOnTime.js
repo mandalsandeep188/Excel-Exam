@@ -3,6 +3,8 @@ import "../App.css";
 import { QuestionContext } from "../App";
 import Taketest from "./TakeTest";
 import Navbar from "../components/Navbar";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function TestOnTime() {
   const { state } = useContext(QuestionContext);
@@ -19,13 +21,15 @@ export default function TestOnTime() {
   const [showtest, setShowTest] = useState(isItTime());
   const [time, setTime] = useState(null);
 
+  let x;
+
   const setTimer = () => {
     let startTime = new Date(state.startTime).getTime();
     const countDownTime = startTime;
 
     const zeroPad = (num, places) => String(num).padStart(places, "0");
 
-    let x = setInterval(() => {
+    x = setInterval(() => {
       let now = new Date().getTime();
       let distance = countDownTime - now;
       let days = Math.floor(distance / (1000 * 60 * 60 * 24));
@@ -56,8 +60,18 @@ export default function TestOnTime() {
   useEffect(() => {
     if (!showtest) {
       setTimer();
+    } else {
+      clearInterval(x);
+      toast.info("Test Started");
     }
-  }, [showtest]);
+  }, [showtest, x]);
+
+  useEffect(() => {
+    return () => {
+      clearInterval(x);
+    };
+  }, []);
+
   return (
     <>
       {showtest ? (
@@ -65,9 +79,22 @@ export default function TestOnTime() {
       ) : (
         <>
           <Navbar />
-          <div className="container">
+          <div
+            className="container"
+            style={{ marginBottom: "-10rem", marginTop: "-3rem" }}
+          >
             {time ? (
-              time
+              <div className="row">
+                <div className="col-md-12">
+                  <img
+                    src="clock.png"
+                    className="img-fluid d-flex justify-content-center m-auto "
+                    alt="timer"
+                  ></img>
+                </div>
+                <h2 className="text-center">Test will start in</h2>
+                <h2 className="text-center text-danger">{time}</h2>
+              </div>
             ) : (
               <div className="d-flex justify-content-center loader">
                 <div

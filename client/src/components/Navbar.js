@@ -6,30 +6,52 @@ import Login from "../screens/Login";
 import Register from "../screens/Register";
 import { UserContext } from "../App";
 import { GoogleLogout } from "react-google-login";
+import { Modal } from "bootstrap";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import Sidebar from "react-sidebar";
+import SidebarContent from "./SidebarContent";
+
+let myModal;
 
 export default function Navbar() {
   const [buttonTarget, setbuttonTarget] = useState("");
   const { user, changeUser } = useContext(UserContext);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const handleModal = (target) => {
+    myModal = new Modal(document.getElementById("login"), {});
+    myModal.show();
+    setbuttonTarget(target);
+  };
+
+  const onSetSidebarOpen = (open) => {
+    setSidebarOpen(open);
+  };
+
+  const closeModal = () => {
+    myModal.hide();
+  };
+
   return (
     <>
-      <nav className="navbar navbar-expand-lg navbar-light bg-light">
+      <nav className="navbar navbar-expand-lg navbar-light">
+        <Sidebar
+          sidebar={<SidebarContent handleModal={handleModal} />}
+          open={sidebarOpen}
+          onSetOpen={onSetSidebarOpen}
+          sidebarClassName={"sidebar"}
+          rootClassName={"sidebar-root"}
+          contentClassName={"content"}
+        >
+          <button className="ham-button" onClick={() => onSetSidebarOpen(true)}>
+            <i className="fa fa-bars"></i>
+          </button>
+        </Sidebar>
         <div className="container-fluid">
           <Link className="navbar-brand" to="/">
-            <img src="EE.png" />
-            <span className="brand">Excel Exam</span>
+            <img src="Logo.png" className="img-fluid" alt="logo" />
           </Link>
-          <button
-            className="navbar-toggler"
-            type="button"
-            data-toggle="collapse"
-            data-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
-          >
-            <span className="navbar-toggler-icon"></span>
-          </button>
-          <div className="collapse navbar-collapse" id="navbarSupportedContent">
+          <div className="stroke mt-3" id="navbarSupportedContent">
             <ul className="navbar-nav mr-auto mb-2 mb-lg-0">
               <li className="nav-item">
                 <Link
@@ -39,7 +61,7 @@ export default function Navbar() {
                   aria-current="page"
                   to="/test"
                 >
-                  Tests
+                  <span>Tests</span>
                 </Link>
               </li>
               <li className="nav-item">
@@ -50,7 +72,7 @@ export default function Navbar() {
                   aria-current="page"
                   to="/practice"
                 >
-                  Practice
+                  <span>Practice</span>
                 </Link>
               </li>
               <li className="nav-item">
@@ -64,19 +86,51 @@ export default function Navbar() {
                   Add Question
                 </Link>
               </li>
-              <li className="nav-item">
-                <Link
-                  className={`nav-link ${
-                    window.location.pathname === "/maketest" ? "active" : ""
-                  }`}
-                  aria-current="page"
-                  to="/maketest"
-                >
-                  Make Test
-                </Link>
-              </li>
               {user ? (
                 <>
+                  {user.type !== "Student" ? (
+                    <>
+                      <li className="nav-item">
+                        <Link
+                          className={`nav-link ${
+                            window.location.pathname === "/maketest"
+                              ? "active"
+                              : ""
+                          }`}
+                          aria-current="page"
+                          to="/maketest"
+                        >
+                          <span>Make Test</span>
+                        </Link>
+                      </li>
+                      <li className="nav-item">
+                        <Link
+                          className={`nav-link ${
+                            window.location.pathname === "/testresults"
+                              ? "active"
+                              : ""
+                          }`}
+                          aria-current="page"
+                          to="/testresults"
+                        >
+                          <span>Test Results</span>
+                        </Link>
+                      </li>
+                    </>
+                  ) : undefined}
+                  {user.type === "Root" ? (
+                    <li className="nav-item">
+                      <Link
+                        className={`nav-link ${
+                          window.location.pathname === "/root" ? "active" : ""
+                        }`}
+                        aria-current="page"
+                        to="/root"
+                      >
+                        <span>Root Control</span>
+                      </Link>
+                    </li>
+                  ) : undefined}
                   <li className="nav-item">
                     <Link
                       className={`nav-link ${
@@ -85,7 +139,7 @@ export default function Navbar() {
                       aria-current="page"
                       to="/profile"
                     >
-                      Profile
+                      <span>Profile</span>
                     </Link>
                   </li>
                   <li className="nav-item">
@@ -94,7 +148,11 @@ export default function Navbar() {
                         <GoogleLogout
                           clientId="983080919072-n4hu753n78cgv7itkbiomp2g5n3cc51i.apps.googleusercontent.com"
                           buttonText="Logout"
-                          onLogoutSuccess={() => changeUser({ type: "LOGOUT" })}
+                          onLogoutSuccess={() => {
+                            changeUser({ type: "LOGOUT" });
+                            localStorage.clear();
+                            toast.error("Logged Out");
+                          }}
                         ></GoogleLogout>
                       ) : (
                         <button
@@ -103,6 +161,7 @@ export default function Navbar() {
                           onClick={() => {
                             changeUser({ type: "LOGOUT" });
                             localStorage.clear();
+                            toast.error("Logged Out");
                           }}
                         >
                           <i className="fa fa-facebook"></i> Logout
@@ -115,6 +174,7 @@ export default function Navbar() {
                         onClick={() => {
                           changeUser({ type: "LOGOUT" });
                           localStorage.clear();
+                          toast.error("Logged Out");
                         }}
                       >
                         Logout
@@ -129,18 +189,14 @@ export default function Navbar() {
                   <button
                     type="button"
                     className="btn btn-primary"
-                    data-toggle="modal"
-                    data-target="#login"
-                    onClick={() => setbuttonTarget("login")}
+                    onClick={() => handleModal("login")}
                   >
                     Login
                   </button>
                   <button
                     type="button"
                     className="btn btn-outline-primary"
-                    data-toggle="modal"
-                    data-target="#login"
-                    onClick={() => setbuttonTarget("register")}
+                    onClick={() => handleModal("register")}
                   >
                     Register
                   </button>
@@ -155,8 +211,6 @@ export default function Navbar() {
       <div
         className="modal fade"
         id="login"
-        data-backdrop="static"
-        data-keyboard="false"
         tabIndex="-1"
         aria-labelledby="login"
         aria-hidden="true"
@@ -164,26 +218,24 @@ export default function Navbar() {
         <div className="modal-dialog modal-lg">
           <div className="modal-content">
             <div className="modal-header">
-              <div className=" navbar-brand">
-                <img src="EE.png" />
-                <span className="brand">Excel Exam</span>
+              <div className="d-flex justify-content-between w-100">
+                <img src="Logo.png" className="img-fluid" alt="logo" />
+                <button className="close-btn" onClick={closeModal}>
+                  <i className="fa fa-close"></i>
+                </button>
               </div>
-              <button
-                type="button"
-                className="btn-close"
-                data-dismiss="modal"
-                aria-label="Close"
-              ></button>
             </div>
             <div className="modal-body">
-              {buttonTarget === "login" ? <Login /> : <Register />}
+              {buttonTarget === "login" ? (
+                <Login modal={closeModal} />
+              ) : (
+                <Register modal={closeModal} />
+              )}
             </div>
             <div className="modal-footer">
               <button
                 type="button"
                 className="btn btn-link"
-                data-toggle="modal"
-                data-target="#login"
                 onClick={() =>
                   setbuttonTarget(
                     `${buttonTarget === "login" ? "register" : "login"}`

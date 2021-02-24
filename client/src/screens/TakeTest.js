@@ -1,10 +1,16 @@
 import React, { useState, useEffect, useContext } from "react";
 import "../App.css";
-import { Link, Prompt, useHistory } from "react-router-dom";
-import { QuestionContext } from "../App";
+import { useHistory } from "react-router-dom";
+import { QuestionContext, UserContext } from "../App";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { confirmAlert } from "react-confirm-alert";
+import "react-confirm-alert/src/react-confirm-alert.css";
+import Sidebar from "react-sidebar";
 
 export default function Taketest() {
   const { state, dispatch } = useContext(QuestionContext);
+  const { user } = useContext(UserContext);
   const [displayQuestion, setDisplayQuestion] = useState(null);
   const [questions, setQuestions] = useState([]);
   const [physics, setPhysics] = useState([]);
@@ -13,9 +19,17 @@ export default function Taketest() {
   const [questionNo, setQuestionNo] = useState(1);
   const [time, setTime] = useState("00 : 00 : 00");
   const [answers, setAnswers] = useState({});
+  const [status, setStatus] = useState([0]);
   const history = useHistory();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const onSetSidebarOpen = (open) => {
+    setSidebarOpen(open);
+  };
 
   useEffect(() => {
+    document.addEventListener("contextmenu", (e) => {
+      e.preventDefault();
+    });
     if (state) {
       let chem = [];
       let phy = [];
@@ -34,27 +48,140 @@ export default function Taketest() {
       let perQuestionTime = 2;
       setTimer(arr.length * perQuestionTime);
 
-      window.addEventListener("beforeunload", function (e) {
-        let confirmationMessage = "Are you sure you want to cancel test?";
+      let displayMessage = true;
+      setTimeout(function () {
+        displayMessage = false;
+      }, perQuestionTime * arr.length * 60000);
 
-        (e || window.event).returnValue = confirmationMessage; //Gecko + IE
-        return confirmationMessage; //Webkit, Safari, Chrome
-      });
+      function confirmExit() {
+        if (displayMessage && window.location.pathname === "/taketest") {
+          return "Are you sure you want to leave?";
+        }
+      }
+      window.onbeforeunload = confirmExit;
     }
-  }, []);
+  }, [state]);
+
+  useEffect(() => {
+    if (questions.length > 0) {
+      let arr = [...Array(questions.length).fill(0)];
+      arr[0] = 1;
+      setStatus(arr);
+    }
+  }, [questions]);
+
+  let x;
+
+  const confirmSubmit = () => {
+    confirmAlert({
+      title: "Confirm to submit",
+      message: "Are you sure you want to submit?",
+      buttons: [
+        {
+          label: "Yes",
+          onClick: () => {
+            submitTest();
+          },
+        },
+        {
+          label: "No",
+        },
+      ],
+    });
+  };
+  const confirmCancel = () => {
+    confirmAlert({
+      title: "Confirm to cancel",
+      message: "Are you sure you want to cancel?",
+      buttons: [
+        {
+          label: "Yes",
+          onClick: () => {
+            toast.error("Test cancelled");
+            history.push("/");
+          },
+        },
+        {
+          label: "No",
+        },
+      ],
+    });
+  };
 
   const submitTest = () => {
-    dispatch({ type: "TEST", payload: { ...state, answers } });
-    history.push("/result");
+    if (state._id) {
+      let correct = 0;
+      let wrong = 0;
+      let unattempt = 0;
+      let ans = [];
+
+      state.selectedQuestions.forEach((question, i) => {
+        if (answers) {
+          if (answers[`${i}`] && question.correct === answers[`${i}`]) {
+            correct++;
+            ans.push(answers[`${i}`]);
+          } else if (answers[`${i}`]) {
+            wrong++;
+            ans.push(answers[`${i}`]);
+          } else {
+            unattempt++;
+            ans.push(null);
+          }
+        }
+      });
+
+      fetch("/saveResult", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: state.title,
+          testID: state._id,
+          correct,
+          wrong,
+          unattempt,
+          user: user._id,
+          userModel: user.from ? "SocialUser" : "User",
+          startTime: state.startTime,
+          questions,
+          answers,
+        }),
+      });
+      toast.info("Test Submitted");
+      history.replace("/");
+    } else {
+      if (state.createdAt) {
+        dispatch({
+          type: "TEST",
+          payload: { ...state, answers },
+        });
+      } else {
+        dispatch({
+          type: "TEST",
+          payload: {
+            ...state,
+            answers,
+            title: "Practice",
+            createdAt: new Date().toISOString(),
+          },
+        });
+      }
+      toast.info("Test Submitted");
+      history.replace("/result");
+    }
   };
 
   const setTimer = (countDownTime) => {
     countDownTime *= 1000 * 60;
     countDownTime += new Date().getTime();
 
+    if (state.startTime) {
+      countDownTime -=
+        new Date().getTime() - new Date(state.startTime).getTime();
+    }
+
     const zeroPad = (num, places) => String(num).padStart(places, "0");
 
-    let x = setInterval(() => {
+    x = setInterval(() => {
       let now = new Date().getTime();
       let distance = countDownTime - now;
       let hours = Math.floor(distance / (1000 * 60 * 60));
@@ -71,132 +198,387 @@ export default function Taketest() {
       // If the count down is finished
       if (distance < 0) {
         clearInterval(x);
-        // alert("Time Ended!");
-        setTime("00 : 00 : 00");
-        submitTest();
+        setTime("00: 00 : 00");
       }
     }, 1000);
+  };
+
+  useEffect(() => {
+    return () => {
+      clearInterval(x);
+    };
+  }, []);
+  const changeStatus = (n, s) => {
+    let arr = [...status];
+    arr[n] = s;
+    setStatus(arr);
   };
 
   const selectedQuestion = (i) => {
     setDisplayQuestion(questions[i]);
     setQuestionNo(i + 1);
+    if (status[i] === 0) changeStatus(i, 1);
   };
 
   const selectAnswer = (answer) => {
     let ans = { ...answers };
     ans[`${questionNo - 1}`] = answer;
     setAnswers(ans);
+    changeStatus(questionNo - 1, 2);
   };
+
+  const getStatus = (n) => {
+    let i = status[n];
+    if (i === 2) return "success";
+    else if (i === 3) return "danger";
+    else if (n + 1 === questionNo) return "info";
+    else if (i === 1) return "warning";
+    else if (i === 0) return "primary";
+  };
+
+  const markForReview = () => {
+    if (status[questionNo - 1] === 3) changeStatus(questionNo - 1, 1);
+    else changeStatus(questionNo - 1, 3);
+  };
+
+  const clearAnswer = () => {
+    if (status[questionNo - 1] === 2) {
+      let ans = { ...answers };
+      ans[`${questionNo - 1}`] = undefined;
+      setAnswers(ans);
+      changeStatus(questionNo - 1, 1);
+    }
+  };
+
+  useEffect(() => {
+    if (time === "00: 00 : 00") submitTest();
+  }, [time]);
 
   return (
     <>
-      <Prompt
-        when={true}
-        message="Are you sure you want to cancel test?"
-        // onConfirm={dispatch({ type: "TEST", payload: null })}
-      />
-      <nav className="navbar navbar-expand-lg navbar-light bg-light">
-        <div className="container-fluid">
-          <Link className="navbar-brand" to="/">
-            <img src="EE.png" />
-            <span className="brand">Excel Exam</span>
-          </Link>
-          <button
-            className="navbar-toggler"
-            type="button"
-            data-toggle="collapse"
-            data-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
-          >
-            <span className="navbar-toggler-icon"></span>
+      <nav className="navbar-expand-lg navbar-light pb-5">
+        <Sidebar
+          sidebar={
+            <>
+              <div className="container-fluid my-3">
+                <div className="row">
+                  <div className="col-md-3 question-opt-div">
+                    <div className="row ques-no">
+                      <div className="q-no">Questions </div>
+                      <div className="status bg-primary">Not Visited</div>
+                      <div className="status bg-info">Current</div>
+                      <div className="status bg-warning text-dark">Visited</div>
+                      <div className="status bg-success">Answered</div>
+                      <div className="status bg-danger">Marked</div>
+                      <div className="accordion" id="accordionSubject">
+                        {physics.length > 0 ? (
+                          <div className="accordion-item">
+                            <div
+                              className="accordion-header"
+                              id="headingPhysics"
+                            >
+                              <div
+                                className="accordion-button collapsed"
+                                type="button"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#collapsePhysics"
+                                aria-expanded="false"
+                                aria-controls="collapsePhysics"
+                              >
+                                <div className="q-sub">Physics</div>
+                              </div>
+                            </div>
+                            <div
+                              id="collapsePhysics"
+                              className="accordion-collapse collapse"
+                              aria-labelledby="headingPhysics"
+                              data-bs-parent="#accordionSubject"
+                            >
+                              <div className="accordion-body row">
+                                {[...Array(physics.length)].map((e, i) => {
+                                  return (
+                                    <div className="col-3" key={i}>
+                                      <button
+                                        type="button"
+                                        className={`btn btn-${getStatus(
+                                          i
+                                        )} ques-opt`}
+                                        onClick={() => selectedQuestion(i)}
+                                      >
+                                        {i + 1}
+                                      </button>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          </div>
+                        ) : undefined}
+                        {chemistry.length > 0 ? (
+                          <div className="accordion-item">
+                            <div
+                              className="accordion-header"
+                              id="headingChemistry"
+                            >
+                              <div
+                                className="accordion-button collapsed"
+                                type="button"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#collapseChemistry"
+                                aria-expanded="false"
+                                aria-controls="collapseChemistry"
+                              >
+                                <div className="q-sub">Chemistry</div>
+                              </div>
+                            </div>
+                            <div
+                              id="collapseChemistry"
+                              className="accordion-collapse collapse"
+                              aria-labelledby="headingChemistry"
+                              data-bs-parent="#accordionSubject"
+                            >
+                              <div className="accordion-body row">
+                                {[...Array(chemistry.length)].map((e, i) => {
+                                  return (
+                                    <div className="col-3" key={i}>
+                                      <button
+                                        type="button"
+                                        className={`btn btn-${getStatus(
+                                          i + physics.length
+                                        )} ques-opt`}
+                                        onClick={() =>
+                                          selectedQuestion(i + physics.length)
+                                        }
+                                      >
+                                        {i + physics.length + 1}
+                                      </button>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          </div>
+                        ) : undefined}
+                        {maths.length > 0 ? (
+                          <div className="accordion-item">
+                            <div className="accordion-header" id="headingMaths">
+                              <div
+                                className="accordion-button collapsed"
+                                type="button"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#collapseMaths"
+                                aria-expanded="false"
+                                aria-controls="collapseMaths"
+                              >
+                                <div className="q-sub">Mathematics </div>
+                              </div>
+                            </div>
+                            <div
+                              id="collapseMaths"
+                              className="accordion-collapse collapse"
+                              aria-labelledby="headingMaths"
+                              data-bs-parent="#accordionSubject"
+                            >
+                              <div className="accordion-body row">
+                                {[...Array(maths.length)].map((e, i) => {
+                                  return (
+                                    <div className="col-3" key={i}>
+                                      <button
+                                        type="button"
+                                        className={`btn btn-${getStatus(
+                                          i +
+                                            physics.length +
+                                            chemistry.length -
+                                            1
+                                        )} ques-opt`}
+                                        onClick={() =>
+                                          selectedQuestion(
+                                            i +
+                                              physics.length +
+                                              chemistry.length
+                                          )
+                                        }
+                                      >
+                                        {i +
+                                          physics.length +
+                                          chemistry.length +
+                                          1}
+                                      </button>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          </div>
+                        ) : undefined}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </>
+          }
+          open={sidebarOpen}
+          onSetOpen={onSetSidebarOpen}
+          sidebarClassName={"sidebar"}
+          rootClassName={"sidebar-root"}
+          contentClassName={"content"}
+        >
+          <button className="ham-button" onClick={() => onSetSidebarOpen(true)}>
+            <i className="fa fa-bars"></i>
           </button>
-          <div className="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul className="navbar-nav mr-auto mb-2 mb-lg-0">
-              <li className="nav-item timer">
-                <h5 className="mx-3 mt-2">{time}</h5>
-              </li>
-              <li className="nav-item">
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  onClick={() => {
-                    history.push("/");
-                  }}
-                >
-                  Cancel
-                </button>
-              </li>
-            </ul>
-          </div>
-        </div>
+        </Sidebar>
       </nav>
 
-      <div className="container-fluid my-3">
+      <div className="d-flex justify-content-end align-content-center mx-5">
+        <h5 className="mx-3 mt-2 text-danger">{time}</h5>
+        <button
+          type="button"
+          className="btn btn-primary"
+          onClick={() => {
+            confirmCancel();
+          }}
+        >
+          Cancel
+        </button>
+      </div>
+
+      <div className="container-fluid mt-3" style={{ marginBottom: "-10rem" }}>
         <div className="row">
-          <div className="col-md-3 question-opt-div">
+          <div className="col-md-3 question-opt-div question-opt-div-lg">
             <div className="row ques-no">
               <div className="q-no">Questions </div>
-              {physics.length > 0 ? (
-                <>
-                  <div className="q-sub">Physics </div>
-                  {[...Array(physics.length)].map((e, i) => {
-                    return (
-                      <div className="col-md-3" key={i}>
-                        <button
-                          type="button"
-                          className="btn btn-primary ques-opt"
-                          onClick={() => selectedQuestion(i)}
-                        >
-                          {i + 1}
-                        </button>
+              <div className="status bg-primary">Not Visited</div>
+              <div className="status bg-info">Current</div>
+              <div className="status bg-warning text-dark">Visited</div>
+              <div className="status bg-success">Answered</div>
+              <div className="status bg-danger">Marked</div>
+              <div className="accordion" id="accordionSubject">
+                {physics.length > 0 ? (
+                  <div className="accordion-item">
+                    <div className="accordion-header" id="headingPhysics">
+                      <div
+                        className="accordion-button collapsed"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#collapsePhysics"
+                        aria-expanded="false"
+                        aria-controls="collapsePhysics"
+                      >
+                        <div className="q-sub">Physics</div>
                       </div>
-                    );
-                  })}
-                </>
-              ) : undefined}
-              {chemistry.length > 0 ? (
-                <>
-                  <div className="q-sub">Chemistry </div>
-                  {[...Array(chemistry.length)].map((e, i) => {
-                    return (
-                      <div className="col-md-3" key={i}>
-                        <button
-                          type="button"
-                          className="btn btn-primary ques-opt"
-                          onClick={() => selectedQuestion(i + physics.length)}
-                        >
-                          {i + physics.length + 1}
-                        </button>
+                    </div>
+                    <div
+                      id="collapsePhysics"
+                      className="accordion-collapse collapse"
+                      aria-labelledby="headingPhysics"
+                      data-bs-parent="#accordionSubject"
+                    >
+                      <div className="accordion-body row">
+                        {[...Array(physics.length)].map((e, i) => {
+                          return (
+                            <div className="col-md-3" key={i}>
+                              <button
+                                type="button"
+                                className={`btn btn-${getStatus(i)} ques-opt`}
+                                onClick={() => selectedQuestion(i)}
+                              >
+                                {i + 1}
+                              </button>
+                            </div>
+                          );
+                        })}
                       </div>
-                    );
-                  })}
-                </>
-              ) : undefined}
-              {maths.length > 0 ? (
-                <>
-                  <div className="q-sub">Mathematics </div>
-                  {[...Array(maths.length)].map((e, i) => {
-                    return (
-                      <div className="col-md-3" key={i}>
-                        <button
-                          type="button"
-                          className="btn btn-primary ques-opt"
-                          onClick={() =>
-                            selectedQuestion(
-                              i + physics.length + chemistry.length
-                            )
-                          }
-                        >
-                          {i + physics.length + chemistry.length + 1}
-                        </button>
+                    </div>
+                  </div>
+                ) : undefined}
+                {chemistry.length > 0 ? (
+                  <div className="accordion-item">
+                    <div className="accordion-header" id="headingChemistry">
+                      <div
+                        className="accordion-button collapsed"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#collapseChemistry"
+                        aria-expanded="false"
+                        aria-controls="collapseChemistry"
+                      >
+                        <div className="q-sub">Chemistry</div>
                       </div>
-                    );
-                  })}
-                </>
-              ) : undefined}
+                    </div>
+                    <div
+                      id="collapseChemistry"
+                      className="accordion-collapse collapse"
+                      aria-labelledby="headingChemistry"
+                      data-bs-parent="#accordionSubject"
+                    >
+                      <div className="accordion-body row">
+                        {[...Array(chemistry.length)].map((e, i) => {
+                          return (
+                            <div className="col-md-3" key={i}>
+                              <button
+                                type="button"
+                                className={`btn btn-${getStatus(
+                                  i + physics.length
+                                )} ques-opt`}
+                                onClick={() =>
+                                  selectedQuestion(i + physics.length)
+                                }
+                              >
+                                {i + physics.length + 1}
+                              </button>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                ) : undefined}
+                {maths.length > 0 ? (
+                  <div className="accordion-item">
+                    <div className="accordion-header" id="headingMaths">
+                      <div
+                        className="accordion-button collapsed"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#collapseMaths"
+                        aria-expanded="false"
+                        aria-controls="collapseMaths"
+                      >
+                        <div className="q-sub">Mathematics </div>
+                      </div>
+                    </div>
+                    <div
+                      id="collapseMaths"
+                      className="accordion-collapse collapse"
+                      aria-labelledby="headingMaths"
+                      data-bs-parent="#accordionSubject"
+                    >
+                      <div className="accordion-body row">
+                        {[...Array(maths.length)].map((e, i) => {
+                          return (
+                            <div className="col-md-3" key={i}>
+                              <button
+                                type="button"
+                                className={`btn btn-${getStatus(
+                                  i + physics.length + chemistry.length - 1
+                                )} ques-opt`}
+                                onClick={() =>
+                                  selectedQuestion(
+                                    i + physics.length + chemistry.length
+                                  )
+                                }
+                              >
+                                {i + physics.length + chemistry.length + 1}
+                              </button>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                ) : undefined}
+              </div>
             </div>
           </div>
           <div className="col-md-8 question">
@@ -207,29 +589,52 @@ export default function Taketest() {
                   <img
                     className="ques-img img-fluid"
                     src={displayQuestion.question}
+                    alt="question"
                   />
                 ) : (
                   <>
                     <p className="ques-p">{displayQuestion.question}</p>
                     <div className="row options">
-                      <div className="col-md-5">
+                      <div className="col-5">
                         <span>A) </span> {displayQuestion.optionA}
                       </div>
-                      <div className="col-md-5">
+                      <div className="col-5">
                         <span>B) </span> {displayQuestion.optionB}
                       </div>
-                      <div className="col-md-5">
+                      <div className="col-5">
                         <span>C) </span> {displayQuestion.optionC}
                       </div>
-                      <div className="col-md-5">
+                      <div className="col-5">
                         <span>D) </span> {displayQuestion.optionD}
                       </div>
                     </div>
                   </>
                 )}
 
+                <div className="d-flex justify-content-end align-items-center mt-2 mr-4">
+                  <div className="form-check mr-2">
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
+                      id="mark"
+                      onChange={() => {
+                        markForReview();
+                      }}
+                      checked={status[questionNo - 1] === 3}
+                    />
+                    <label className="form-check-label" htmlFor="mark">
+                      Mark for Review
+                    </label>
+                  </div>
+                  <button
+                    className="btn btn-primary mr-2"
+                    onClick={clearAnswer}
+                  >
+                    Clear Answer
+                  </button>
+                </div>
                 <div className="row select-options">
-                  <div className="col-md-6">
+                  <div className="col-6">
                     <input
                       type="radio"
                       className="btn-check"
@@ -252,7 +657,7 @@ export default function Taketest() {
                       Option A
                     </label>
                   </div>
-                  <div className="col-md-6">
+                  <div className="col-6">
                     <input
                       type="radio"
                       className="btn-check"
@@ -275,7 +680,7 @@ export default function Taketest() {
                       Option B
                     </label>
                   </div>
-                  <div className="col-md-6">
+                  <div className="col-6">
                     <input
                       type="radio"
                       className="btn-check"
@@ -298,7 +703,7 @@ export default function Taketest() {
                       Option C
                     </label>
                   </div>
-                  <div className="col-md-6">
+                  <div className="col-6">
                     <input
                       type="radio"
                       className="btn-check"
@@ -352,7 +757,7 @@ export default function Taketest() {
                     <button
                       type="button"
                       className="btn btn-success next"
-                      onClick={() => submitTest()}
+                      onClick={() => confirmSubmit()}
                     >
                       Submit
                     </button>

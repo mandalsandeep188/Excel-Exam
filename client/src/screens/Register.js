@@ -2,22 +2,23 @@ import React, { useState, useEffect, useContext } from "react";
 import "../App.css";
 import { GoogleLogin } from "react-google-login";
 import FacebookLogin from "react-facebook-login";
-import { useHistory } from "react-router-dom";
 import { UserContext } from "../App";
-import { Modal } from "bootstrap";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-const firebase = require("firebase");
+const firebase = require("firebase/app");
+require("firebase/storage");
 const storageRef = firebase.storage().ref();
 
-export default function Register() {
-  const { user, changeUser } = useContext(UserContext);
+export default function Register(props) {
+  const { changeUser } = useContext(UserContext);
   const [pic, setPic] = useState(null);
   const [imagePreview, setImagePreview] = useState("user.jpeg");
   const [name, setName] = useState(null);
   const [email, setEmail] = useState(null);
   const [password, setPassword] = useState(null);
   const [imageUrl, setImageUrl] = useState(null);
-  const history = useHistory();
+  const [loader, setLoader] = useState(false);
 
   useEffect(() => {
     if (pic) {
@@ -28,14 +29,6 @@ export default function Register() {
       reader.readAsDataURL(pic);
     }
   }, [pic]);
-
-  const toggleModal = () => {
-    // let myModal = new Modal(document.getElementById("login"), {
-    //   keyboard: false,
-    // });
-    // console.log(myModal);
-    // myModal.hide();
-  };
 
   const registerUser = () => {
     if (name && email && password) {
@@ -56,34 +49,52 @@ export default function Register() {
           localStorage.setItem("jwt", data.token);
           localStorage.setItem("user", JSON.stringify(data.user));
           changeUser({ type: "LOGIN", payload: data.user });
-          alert(data.message);
-          toggleModal();
+          props.modal();
+          setLoader(false);
+          toast.success("Registered Successfully");
         })
-        .catch((err) => alert(err.message));
+        .catch((err) => toast.error(err.message));
     }
   };
 
   const register = () => {
-    if (pic && email && name) {
-      const fileName = `users/${email}`;
-      storageRef
-        .child(fileName)
-        .put(pic)
-        .then((snapshot) => {
-          storageRef
-            .child(fileName)
-            .getDownloadURL()
-            .then((url) => {
-              setImageUrl(url);
-              console.log(url);
-            })
-            .catch((error) => {
-              alert(error.code);
-            });
-        });
-    } else {
-      registerUser();
-    }
+    setLoader(true);
+    fetch("/checkEmail", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email,
+      }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.error) {
+          toast.error(data.error);
+          setLoader(false);
+        } else {
+          if (pic) {
+            const fileName = `users/${email}`;
+            storageRef
+              .child(fileName)
+              .put(pic)
+              .then(() => {
+                storageRef
+                  .child(fileName)
+                  .getDownloadURL()
+                  .then((url) => {
+                    setImageUrl(url);
+                  })
+                  .catch((error) => {
+                    console.log(error.code);
+                  });
+              });
+          } else {
+            registerUser();
+          }
+        }
+      });
   };
 
   useEffect(() => {
@@ -115,9 +126,11 @@ export default function Register() {
       })
         .then((res) => res.json())
         .then((data) => {
-          let gUser = { ...googleUser, _id: data._id };
+          let gUser = { ...googleUser, _id: data._id, type: data.type };
           localStorage.setItem("user", JSON.stringify(gUser));
           changeUser({ type: "LOGIN", payload: gUser });
+          props.modal();
+          toast.success("Registered Successfully");
         });
     } catch (err) {
       console.log(err);
@@ -140,22 +153,29 @@ export default function Register() {
           id: response.userID,
           email: response.email,
           name: response.name,
-          pic: response.picture.data.url,
           from: "Facebook",
         }),
       })
         .then((res) => res.json())
         .then((data) => {
-          let fbUser = { ...facebookUser, _id: data._id };
+          let fbUser = { ...facebookUser, _id: data._id, type: data.type };
           localStorage.setItem("user", JSON.stringify(fbUser));
           changeUser({ type: "LOGIN", payload: fbUser });
+          props.modal();
+          toast.success("Registered Successfully");
         });
     } catch (err) {
       console.log(err);
     }
   };
+
   return (
     <>
+      {loader ? (
+        <div className="d-flex justify-content-center loader">
+          <div className="spinner-border text-primary" role="status"></div>
+        </div>
+      ) : undefined}
       <GoogleLogin
         clientId="983080919072-n4hu753n78cgv7itkbiomp2g5n3cc51i.apps.googleusercontent.com"
         buttonText="Continue with Google"
@@ -168,6 +188,7 @@ export default function Register() {
         appId="863319710877687"
         fields="name,email,picture"
         callback={responseFacebook}
+        onFailure={responseFacebook}
         cssClass="facebook-button"
         icon="fa-facebook"
       />
@@ -175,7 +196,13 @@ export default function Register() {
       <hr />
       <h3 className="my-3 text-center">Register with Excel Exam</h3>
       <div className="container login-form">
-        <form className="rows">
+        <form
+          className="rows"
+          onSubmit={(e) => {
+            e.preventDefault();
+            register();
+          }}
+        >
           <div className="mb-3 col-md-8">
             <img
               className="register-pic img-fluid"
@@ -204,6 +231,7 @@ export default function Register() {
               className="form-control"
               id="name"
               onChange={(e) => setName(e.target.value)}
+              required
             />
           </div>
           <div className="mb-3 col-md-8">
@@ -215,6 +243,7 @@ export default function Register() {
               className="form-control"
               id="email"
               onChange={(e) => setEmail(e.target.value)}
+              required
             />
           </div>
           <div className="mb-3 col-md-8">
@@ -226,17 +255,11 @@ export default function Register() {
               className="form-control"
               id="password"
               onChange={(e) => setPassword(e.target.value)}
+              required
             />
           </div>
           <div className="mb-3 col-md-8">
-            <button
-              type="submit"
-              className="btn btn-primary"
-              onClick={(e) => {
-                e.preventDefault();
-                register();
-              }}
-            >
+            <button type="submit" className="btn btn-primary">
               Register
             </button>
           </div>

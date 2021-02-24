@@ -2,16 +2,24 @@ import React, { useState, useEffect, useContext } from "react";
 import { useHistory } from "react-router-dom";
 import "../App.css";
 import chapters from "../constants/chapters";
-import { QuestionContext } from "../App";
+import { QuestionContext, UserContext } from "../App";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function Practice() {
   const { dispatch } = useContext(QuestionContext);
+  const { user } = useContext(UserContext);
   const [subject, setSubject] = useState([]);
   const [standard, setStandard] = useState([]);
   const [chapter, setChapter] = useState([]);
   const [selectedChapter, setSelectedChapter] = useState([]);
-  const [noOfQuestions, setNoOfQuestions] = useState(0);
+  const [noOfQuestions, setNoOfQuestions] = useState(null);
+  const [loader, setLoader] = useState(false);
   const history = useHistory();
+
+  useEffect(() => {
+    dispatch({ type: "SUBMIT" });
+  }, [dispatch]);
 
   useEffect(() => {
     if (subject && standard) {
@@ -71,36 +79,47 @@ export default function Practice() {
   };
 
   const practice = () => {
-    console.log(standard, subject, selectedChapter);
-    fetch("/practice", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        noOfQuestions,
-        standard,
-        subject,
-        selectedChapter,
-      }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data);
-        dispatch({
-          type: "TEST",
-          payload: {
-            selectedQuestions: data.questions,
-          },
-        });
-        history.push("/taketest");
+    if (!user) {
+      toast.error("Login to continue");
+    } else if (noOfQuestions && noOfQuestions > 0) {
+      setLoader(true);
+      fetch("/practice", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          noOfQuestions,
+          standard,
+          subject,
+          selectedChapter,
+        }),
       })
-      .catch((err) => console.log(err));
+        .then((res) => res.json())
+        .then((data) => {
+          dispatch({
+            type: "TEST",
+            payload: {
+              selectedQuestions: data.questions,
+            },
+          });
+          setLoader(false);
+          history.push("/taketest");
+        })
+        .catch((err) => console.log(err));
+    } else {
+      toast.error("Invalid No. of Questions!");
+    }
   };
 
   return (
     <>
-      <div className="container my-4">
+      <div className="container practice-container">
+        {loader ? (
+          <div className="d-flex justify-content-center loader">
+            <div className="spinner-border text-primary" role="status"></div>
+          </div>
+        ) : undefined}
         <div className="row">
-          <div className="filter">
+          <div className="col-md-5 filter m-auto">
             <h5 className="mt-1">Class</h5>
             <div className="form-check form-check-inline">
               <input
@@ -201,27 +220,27 @@ export default function Practice() {
             )}
             <hr />
             <div className="row g-3">
-              <label htmlFor="number" className="col-sm-2 col-form-label">
+              <label htmlFor="number" className="col-sm-4 col-form-label">
                 No. of questions
               </label>
-              <div className="col-md-2">
+              <div className="col-md-4">
                 <input
                   type="number"
                   className="form-control"
                   id="number"
                   onChange={(e) => setNoOfQuestions(e.target.value)}
+                  required
                 />
               </div>
-
-              <div className="col-md-7">
-                <button
-                  type="submit"
-                  className="btn btn-primary"
-                  onClick={() => practice()}
-                >
-                  Practice
-                </button>
-              </div>
+            </div>
+            <div className="col-md-7 mt-2">
+              <button
+                type="submit"
+                className="btn btn-primary"
+                onClick={() => practice()}
+              >
+                Practice
+              </button>
             </div>
           </div>
         </div>

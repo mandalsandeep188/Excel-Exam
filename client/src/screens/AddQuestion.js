@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from "react";
 import "../App.css";
-import { useHistory } from "react-router-dom";
 import chapters from "../constants/chapters";
 import ReactCrop from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-const firebase = require("firebase");
+const firebase = require("firebase/app");
+require("firebase/storage");
 const storageRef = firebase.storage().ref();
 
 function uuidv4() {
   return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
     var r = (Math.random() * 16) | 0,
-      v = c == "x" ? r : (r & 0x3) | 0x8;
+      v = c === "x" ? r : (r & 0x3) | 0x8;
     return v.toString(16);
   });
 }
@@ -28,14 +30,13 @@ export default function AddQuestion() {
   const [optionB, setOptionB] = useState("");
   const [optionC, setOptionC] = useState("");
   const [optionD, setOptionD] = useState("");
-  const [correct, setCorrect] = useState("");
+  const [correct, setCorrect] = useState(null);
   const [upImg, setUpImg] = useState(null);
   const [crop, setCrop] = useState({ unit: "%", width: 100, height: 100 });
   const [completedCrop, setCompletedCrop] = useState(null);
   const [questionImage, setQuestionImage] = useState(null);
   const [cropedImage, setCropedImage] = useState(null);
   const [loader, setLoader] = useState(false);
-  const history = useHistory();
 
   const onSelectFile = (e) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -74,7 +75,7 @@ export default function AddQuestion() {
       const base64Image = canvas.toDataURL("image/jpeg");
       setCropedImage(base64Image);
     }
-  }, [completedCrop]);
+  }, [completedCrop, questionImage]);
 
   useEffect(() => {
     if (standard && subject) {
@@ -99,33 +100,38 @@ export default function AddQuestion() {
   }, [standard, subject]);
 
   const addQuestionField = () => {
-    setLoader(true);
-    fetch("/addQuestion", {
-      method: "post",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        question,
-        optionA,
-        optionB,
-        optionC,
-        optionD,
-        correct,
-        standard,
-        subject,
-        chapter,
-      }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.err) {
-          return alert(data.err);
-        }
-        alert("Question added successfully");
-        setLoader(false);
+    if (standard && subject && chapter && correct) {
+      setLoader(true);
+      fetch("/addQuestion", {
+        method: "post",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          question,
+          optionA,
+          optionB,
+          optionC,
+          optionD,
+          correct,
+          standard,
+          subject,
+          chapter,
+        }),
       })
-      .catch((err) => alert(err));
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.err) {
+            toast.err(data.err);
+            return;
+          }
+          toast.success("Question added successfully");
+          setLoader(false);
+        })
+        .catch((err) => console.log(err));
+    } else {
+      toast.error("Select all fiels!!");
+    }
   };
 
   useEffect(() => {
@@ -140,7 +146,8 @@ export default function AddQuestion() {
       cropedImage !== "data:," &&
       standard &&
       chapter &&
-      subject
+      subject &&
+      correct
     ) {
       const fileName = `${standard}/${subject}/${chapter}/${uuidv4()}`;
       storageRef
@@ -159,6 +166,9 @@ export default function AddQuestion() {
         });
     } else {
       if (!cropedImage) addQuestionField();
+      else {
+        toast.error("Select all fields!!");
+      }
     }
   };
 
@@ -185,6 +195,7 @@ export default function AddQuestion() {
             <select
               className="form-select"
               onChange={(e) => setSubject(e.target.value)}
+              required
             >
               <option defaultValue>Select Subject</option>
               <option>Physics</option>
@@ -199,6 +210,7 @@ export default function AddQuestion() {
             <select
               className="form-select"
               onChange={(e) => setStandard(e.target.value)}
+              required
             >
               <option defaultValue>Select Class</option>
               <option>11th</option>
@@ -212,6 +224,7 @@ export default function AddQuestion() {
             <select
               className="form-select"
               onChange={(e) => setChapter(e.target.value)}
+              required
             >
               <option defaultValue>Select Chapter</option>
               {chapterOptions.map((opt) => {
@@ -274,6 +287,7 @@ export default function AddQuestion() {
                   placeholder="Option A"
                   aria-label="Option A"
                   onChange={(e) => setOptionA(e.target.value)}
+                  required
                 />
               </div>
               <div className="col-md-6">
@@ -283,6 +297,7 @@ export default function AddQuestion() {
                   placeholder="Option B"
                   aria-label="Option B"
                   onChange={(e) => setOptionB(e.target.value)}
+                  required
                 />
               </div>
               <div className="col-md-6">
@@ -292,6 +307,7 @@ export default function AddQuestion() {
                   placeholder="Option C"
                   aria-label="Option C"
                   onChange={(e) => setOptionC(e.target.value)}
+                  required
                 />
               </div>
               <div className="col-md-6">
@@ -301,6 +317,7 @@ export default function AddQuestion() {
                   placeholder="Option D"
                   aria-label="Option D"
                   onChange={(e) => setOptionD(e.target.value)}
+                  required
                 />
               </div>
             </>
@@ -313,6 +330,7 @@ export default function AddQuestion() {
                   id="customFile"
                   accept="image/*"
                   onChange={onSelectFile}
+                  required
                 />
                 <label className="form-file-label upload" htmlFor="customFile">
                   <span className="form-file-text">
@@ -361,6 +379,7 @@ export default function AddQuestion() {
                       placeholder="Option A"
                       aria-label="Option A"
                       onChange={(e) => setOptionA(e.target.value)}
+                      required
                     />
                   </div>
                   <div className="col-md-6">
@@ -370,6 +389,7 @@ export default function AddQuestion() {
                       placeholder="Option B"
                       aria-label="Option B"
                       onChange={(e) => setOptionB(e.target.value)}
+                      required
                     />
                   </div>
                   <div className="col-md-6">
@@ -379,6 +399,7 @@ export default function AddQuestion() {
                       placeholder="Option C"
                       aria-label="Option C"
                       onChange={(e) => setOptionC(e.target.value)}
+                      required
                     />
                   </div>
                   <div className="col-md-6">
@@ -388,6 +409,7 @@ export default function AddQuestion() {
                       placeholder="Option D"
                       aria-label="Option D"
                       onChange={(e) => setOptionD(e.target.value)}
+                      required
                     />
                   </div>
                 </>
@@ -401,6 +423,7 @@ export default function AddQuestion() {
             <select
               className="form-select"
               onChange={(e) => setCorrect(e.target.value)}
+              required
             >
               <option defaultValue>Select correct option</option>
               <option>Option A</option>
