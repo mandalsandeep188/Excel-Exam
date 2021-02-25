@@ -27,9 +27,6 @@ export default function Taketest() {
   };
 
   useEffect(() => {
-    document.addEventListener("contextmenu", (e) => {
-      e.preventDefault();
-    });
     if (state) {
       let chem = [];
       let phy = [];

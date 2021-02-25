@@ -1,4 +1,4 @@
-import React, { createContext, useReducer } from "react";
+import React, { createContext, useEffect, useReducer } from "react";
 import { BrowserRouter } from "react-router-dom";
 import "./App.css";
 import Routing from "./components/Routing";
@@ -13,6 +13,11 @@ export const UserContext = createContext();
 function App() {
   const [state, dispatch] = useReducer(reducer, inState);
   const [user, changeUser] = useReducer(userReducer, inUser);
+  useEffect(() => {
+    document.addEventListener("contextmenu", (e) => {
+      e.preventDefault();
+    });
+  }, []);
   return (
     <UserContext.Provider value={{ user, changeUser }}>
       <QuestionContext.Provider value={{ state, dispatch }}>
