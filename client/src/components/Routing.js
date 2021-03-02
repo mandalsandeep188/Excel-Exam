@@ -15,6 +15,7 @@ import Practice from "../screens/Practice";
 import Root from "../screens/Root";
 import Footer from "./Footer";
 import TestResults from "../screens/TestResults";
+import PrivacyPolicy from "../screens/PrivacyPolicy";
 
 export default function Routing() {
   const { user, changeUser } = useContext(UserContext);
@@ -106,6 +107,11 @@ export default function Routing() {
       <Route path="/practice">
         <Navbar />
         <Practice />
+        <Footer />
+      </Route>
+      <Route path="/privacyPolicy">
+        <Navbar />
+        <PrivacyPolicy />
         <Footer />
       </Route>
       <Route path="/">

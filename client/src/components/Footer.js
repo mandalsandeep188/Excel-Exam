@@ -11,48 +11,50 @@ export default function Footer() {
       <footer className="row g-3">
         <div className="col-md-8">
           <Link to="/">Excel Exam </Link>© {getYear()} - All rights reserved
+          <br />
+          <Link to="/privacyPolicy">Privacy Policy</Link>
         </div>
         <div className="social-icons col-md-4">
-          <Link
+          <a
             className="fb"
-            to="https://www.facebook.com/cleancodingsm/"
+            href="https://www.facebook.com/cleancodingsm/"
             target="blank"
             title="Join Us On Facebook"
           >
             <i className="fa fa-facebook"></i>
-          </Link>
-          <Link
+          </a>
+          <a
             className="twt"
-            to="https://twitter.com/CodingClean"
+            href="https://twitter.com/CodingClean"
             target="blank"
             title="Follow Us On Twitter"
           >
             <i className="fa fa-twitter"></i>
-          </Link>
-          <Link
+          </a>
+          <a
             className="insta"
-            to="https://www.instagram.com/clean.coding/"
+            href="https://www.instagram.com/clean.coding/"
             target="blank"
             title="Follow Us On Instagram"
           >
             <i className="fa fa-instagram"></i>
-          </Link>
-          <Link
+          </a>
+          <a
             className="git"
-            to="https://www.github.com/mandalsandeep188/"
+            href="https://www.github.com/mandalsandeep188/"
             target="blank"
             title="Follow Us On Github"
           >
             <i className="fa fa-github"></i>
-          </Link>
-          <Link
+          </a>
+          <a
             className="in"
-            to="https://www.linkedin.com/in/sandeep-mandal-3513601bb/"
+            href="https://www.linkedin.com/in/sandeep-mandal-3513601bb/"
             target="blank"
             title="Join Us On Linkedin"
           >
             <i className="fa fa-linkedin"></i>
-          </Link>
+          </a>
         </div>
       </footer>
     </div>
