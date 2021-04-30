@@ -291,10 +291,10 @@ export default function Taketest() {
                               aria-labelledby="headingPhysics"
                               data-bs-parent="#accordionSubject"
                             >
-                              <div className="accordion-body row">
+                              <div className="accordion-body row gx-3">
                                 {[...Array(physics.length)].map((e, i) => {
                                   return (
-                                    <div className="col-3" key={i}>
+                                    <div className="col-2" key={i}>
                                       <button
                                         type="button"
                                         className={`btn btn-${getStatus(
@@ -334,10 +334,10 @@ export default function Taketest() {
                               aria-labelledby="headingChemistry"
                               data-bs-parent="#accordionSubject"
                             >
-                              <div className="accordion-body row">
+                              <div className="accordion-body row gx-3">
                                 {[...Array(chemistry.length)].map((e, i) => {
                                   return (
-                                    <div className="col-3" key={i}>
+                                    <div className="col-2" key={i}>
                                       <button
                                         type="button"
                                         className={`btn btn-${getStatus(
@@ -376,17 +376,14 @@ export default function Taketest() {
                               aria-labelledby="headingMaths"
                               data-bs-parent="#accordionSubject"
                             >
-                              <div className="accordion-body row">
+                              <div className="accordion-body row gx-3">
                                 {[...Array(maths.length)].map((e, i) => {
                                   return (
-                                    <div className="col-3" key={i}>
+                                    <div className="col-2" key={i}>
                                       <button
                                         type="button"
                                         className={`btn btn-${getStatus(
-                                          i +
-                                            physics.length +
-                                            chemistry.length -
-                                            1
+                                          i + physics.length + chemistry.length
                                         )} ques-opt`}
                                         onClick={() =>
                                           selectedQuestion(
@@ -450,7 +447,11 @@ export default function Taketest() {
               <div className="status bg-warning text-dark">Visited</div>
               <div className="status bg-success">Answered</div>
               <div className="status bg-danger">Marked</div>
-              <div className="accordion" id="accordionSubject">
+              <div
+                className="accordion"
+                id="accordionSubject"
+                style={{ padding: "12px" }}
+              >
                 {physics.length > 0 ? (
                   <div className="accordion-item">
                     <div className="accordion-header" id="headingPhysics">
@@ -471,10 +472,10 @@ export default function Taketest() {
                       aria-labelledby="headingPhysics"
                       data-bs-parent="#accordionSubject"
                     >
-                      <div className="accordion-body row">
+                      <div className="accordion-body row gx-3">
                         {[...Array(physics.length)].map((e, i) => {
                           return (
-                            <div className="col-md-3" key={i}>
+                            <div className="col-md-2" key={i}>
                               <button
                                 type="button"
                                 className={`btn btn-${getStatus(i)} ques-opt`}
@@ -509,10 +510,10 @@ export default function Taketest() {
                       aria-labelledby="headingChemistry"
                       data-bs-parent="#accordionSubject"
                     >
-                      <div className="accordion-body row">
+                      <div className="accordion-body row gx-3">
                         {[...Array(chemistry.length)].map((e, i) => {
                           return (
-                            <div className="col-md-3" key={i}>
+                            <div className="col-md-2" key={i}>
                               <button
                                 type="button"
                                 className={`btn btn-${getStatus(
@@ -551,14 +552,14 @@ export default function Taketest() {
                       aria-labelledby="headingMaths"
                       data-bs-parent="#accordionSubject"
                     >
-                      <div className="accordion-body row">
+                      <div className="accordion-body row gx-3">
                         {[...Array(maths.length)].map((e, i) => {
                           return (
-                            <div className="col-md-3" key={i}>
+                            <div className="col-md-2" key={i}>
                               <button
                                 type="button"
                                 className={`btn btn-${getStatus(
-                                  i + physics.length + chemistry.length - 1
+                                  i + physics.length + chemistry.length
                                 )} ques-opt`}
                                 onClick={() =>
                                   selectedQuestion(

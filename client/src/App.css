@@ -530,7 +530,7 @@ footer .social-icons a i {
   border-radius: 8px;
   padding: 0;
   min-height: 400px;
-  max-height: 1000px;
+  height: fit-content;
   position: relative;
 }
 .ques-no {
@@ -539,9 +539,10 @@ footer .social-icons a i {
   padding: 0;
 }
 .ques-opt {
-  font-size: 1.5rem;
-  min-width: 52px;
   margin-bottom: 10px;
+  min-width: 43px;
+  padding: 8px;
+  font-weight: bold;
 }
 .question-opt-div {
   margin-left: 20px;
