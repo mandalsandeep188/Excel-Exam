@@ -584,11 +584,29 @@ export default function Taketest() {
             {displayQuestion ? (
               <>
                 {displayQuestion.question.search("https://") !== -1 ? (
-                  <img
-                    className="ques-img img-fluid"
-                    src={displayQuestion.question}
-                    alt="question"
-                  />
+                  <>
+                    <img
+                      className="ques-img img-fluid"
+                      src={displayQuestion.question}
+                      alt="question"
+                    />
+                    {displayQuestion.optionA ? (
+                      <div className="row options">
+                        <div className="col-5">
+                          <span>A) </span> {displayQuestion.optionA}
+                        </div>
+                        <div className="col-5">
+                          <span>B) </span> {displayQuestion.optionB}
+                        </div>
+                        <div className="col-5">
+                          <span>C) </span> {displayQuestion.optionC}
+                        </div>
+                        <div className="col-5">
+                          <span>D) </span> {displayQuestion.optionD}
+                        </div>
+                      </div>
+                    ) : undefined}
+                  </>
                 ) : (
                   <>
                     <p className="ques-p">{displayQuestion.question}</p>
