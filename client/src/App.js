@@ -13,11 +13,11 @@ export const UserContext = createContext();
 function App() {
   const [state, dispatch] = useReducer(reducer, inState);
   const [user, changeUser] = useReducer(userReducer, inUser);
-  useEffect(() => {
-    document.addEventListener("contextmenu", (e) => {
-      e.preventDefault();
-    });
-  }, []);
+  // useEffect(() => {
+  //   document.addEventListener("contextmenu", (e) => {
+  //     e.preventDefault();
+  //   });
+  // }, []);
   return (
     <UserContext.Provider value={{ user, changeUser }}>
       <QuestionContext.Provider value={{ state, dispatch }}>
