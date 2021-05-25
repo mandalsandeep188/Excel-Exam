@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "../App.css";
 import chapters from "../constants/chapters";
-import ReactCrop from "react-image-crop";
-import "react-image-crop/dist/ReactCrop.css";
+import Cropper from "react-cropper";
+import "cropperjs/dist/cropper.css";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -32,11 +32,15 @@ export default function AddQuestion() {
   const [optionD, setOptionD] = useState("");
   const [correct, setCorrect] = useState(null);
   const [upImg, setUpImg] = useState(null);
-  const [crop, setCrop] = useState({ unit: "%", width: 100, height: 100 });
-  const [completedCrop, setCompletedCrop] = useState(null);
-  const [questionImage, setQuestionImage] = useState(null);
   const [cropedImage, setCropedImage] = useState(null);
   const [loader, setLoader] = useState(false);
+
+  const cropperRef = useRef(null);
+  const onCrop = () => {
+    const imageElement = cropperRef?.current;
+    const cropper = imageElement?.cropper;
+    setCropedImage(cropper.getCroppedCanvas().toDataURL());
+  };
 
   const onSelectFile = (e) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -45,37 +49,6 @@ export default function AddQuestion() {
       reader.readAsDataURL(e.target.files[0]);
     }
   };
-
-  const onLoad = (img) => {
-    setQuestionImage(img);
-  };
-
-  useEffect(() => {
-    if (completedCrop !== null && questionImage) {
-      let canvas = document.createElement("canvas");
-      const scaleX = questionImage.naturalWidth / questionImage.width;
-      const scaleY = questionImage.naturalHeight / questionImage.height;
-      canvas.width = completedCrop.width;
-      canvas.height = completedCrop.height;
-      const ctx = canvas.getContext("2d");
-
-      ctx.drawImage(
-        questionImage,
-        completedCrop.x * scaleX,
-        completedCrop.y * scaleY,
-        completedCrop.width * scaleX,
-        completedCrop.height * scaleY,
-        0,
-        0,
-        completedCrop.width,
-        completedCrop.height
-      );
-
-      // As Base64 string
-      const base64Image = canvas.toDataURL("image/jpeg");
-      setCropedImage(base64Image);
-    }
-  }, [completedCrop, questionImage]);
 
   useEffect(() => {
     if (standard && subject) {
@@ -341,17 +314,16 @@ export default function AddQuestion() {
               </div>
               {upImg ? (
                 <div className="col-md-8">
-                  <ReactCrop
+                  <Cropper
                     src={upImg}
-                    onImageLoaded={onLoad}
-                    crop={crop}
-                    onChange={(c) => setCrop(c)}
-                    onComplete={(c) => setCompletedCrop(c)}
+                    initialAspectRatio={16 / 9}
+                    crop={onCrop}
+                    ref={cropperRef}
                   />
                 </div>
               ) : undefined}
               {cropedImage && cropedImage !== "data:," ? (
-                <div className="col-md-4">
+                <div className="col-md-8">
                   <img src={cropedImage} className="img-fluid croped" />
                 </div>
               ) : undefined}

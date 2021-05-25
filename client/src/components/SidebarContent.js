@@ -103,7 +103,7 @@ export default function SidebarContent(props) {
                   <span>Profile</span>
                 </Link>
               </li>
-              <li className="nav-item">
+              <li className="nav-item mt-3">
                 {user.from ? (
                   user.from === "Google" ? (
                     <GoogleLogout
@@ -146,7 +146,7 @@ export default function SidebarContent(props) {
           ) : undefined}
 
           {!user ? (
-            <li className="nav-item">
+            <li className="nav-item mt-3">
               <button
                 type="button"
                 className="btn btn-primary"

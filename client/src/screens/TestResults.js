@@ -86,7 +86,10 @@ export default function TestResults() {
 
               <div className="col-md-5 mx-5 res mt-2">
                 <h5>Results</h5>
-                <ul className="list-group h-100 overflow-auto">
+                <ul
+                  className="list-group overflow-auto"
+                  style={{ height: "300px" }}
+                >
                   <li className="list-group-item d-flex justify-content-between">
                     <span className="font-weight-bold">Name</span>
                     <span className="font-weight-bold">Marks</span>
@@ -107,8 +110,6 @@ export default function TestResults() {
             </div>
           );
         })
-      ) : tests.length === 0 ? (
-        "No Tests Available"
       ) : (
         <div className="d-flex justify-content-center loader">
           <div className="spinner-border text-primary" role="status"></div>
