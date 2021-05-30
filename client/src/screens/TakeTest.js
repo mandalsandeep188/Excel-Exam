@@ -291,10 +291,14 @@ export default function Taketest() {
                               aria-labelledby="headingPhysics"
                               data-bs-parent="#accordionSubject"
                             >
-                              <div className="accordion-body row gx-3">
+                              <div className="accordion-body row gx-0">
                                 {[...Array(physics.length)].map((e, i) => {
                                   return (
-                                    <div className="col-2" key={i}>
+                                    <div
+                                      className="col-2"
+                                      key={i}
+                                      style={{ marginRight: "18px" }}
+                                    >
                                       <button
                                         type="button"
                                         className={`btn btn-${getStatus(
@@ -334,10 +338,14 @@ export default function Taketest() {
                               aria-labelledby="headingChemistry"
                               data-bs-parent="#accordionSubject"
                             >
-                              <div className="accordion-body row gx-3">
+                              <div className="accordion-body row">
                                 {[...Array(chemistry.length)].map((e, i) => {
                                   return (
-                                    <div className="col-2" key={i}>
+                                    <div
+                                      className="col-2"
+                                      key={i}
+                                      style={{ marginRight: "18px" }}
+                                    >
                                       <button
                                         type="button"
                                         className={`btn btn-${getStatus(
@@ -376,10 +384,14 @@ export default function Taketest() {
                               aria-labelledby="headingMaths"
                               data-bs-parent="#accordionSubject"
                             >
-                              <div className="accordion-body row gx-3">
+                              <div className="accordion-body row gx-0">
                                 {[...Array(maths.length)].map((e, i) => {
                                   return (
-                                    <div className="col-2" key={i}>
+                                    <div
+                                      className="col-2"
+                                      key={i}
+                                      style={{ marginRight: "18px" }}
+                                    >
                                       <button
                                         type="button"
                                         className={`btn btn-${getStatus(
@@ -424,7 +436,10 @@ export default function Taketest() {
         </Sidebar>
       </nav>
 
-      <div className="d-flex justify-content-end align-content-center mx-5">
+      <div
+        className="d-flex justify-content-end align-content-center mx-5"
+        style={{ position: "relative" }}
+      >
         <h5 className="mx-3 mt-2 text-danger">{time}</h5>
         <button
           type="button"

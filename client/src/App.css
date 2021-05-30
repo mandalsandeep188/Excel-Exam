@@ -549,6 +549,7 @@ footer .social-icons a i {
 }
 .ques-img {
   margin: 0 10px;
+  max-width: 65%;
 }
 .ques-p {
   margin: 0 10px;
@@ -609,6 +610,7 @@ footer .social-icons a i {
   }
   .ques-img {
     margin: 0;
+    max-width: 100%;
   }
 }
 
